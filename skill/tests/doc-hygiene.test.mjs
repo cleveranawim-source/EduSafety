@@ -35,7 +35,7 @@ describe('문서 위생', () => {
       const at = task2.search(new RegExp(`id: ["']${id}["']`))
       if (at < 0) return null
       const rest = task2.slice(at)
-      const end = rest.search(/\n  \},/)
+      const end = rest.search(/\n {2}\},/)
       return end < 0 ? rest : rest.slice(0, end)
     }
 

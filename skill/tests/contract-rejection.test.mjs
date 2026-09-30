@@ -3,7 +3,6 @@ import { describe, it, expect } from 'vitest'
 import { validateReport, loadContract } from '../edusafe/scripts/render.mjs'
 
 const items = JSON.parse(readFileSync('edusafe/rules/items.json', 'utf8')).items
-const version = JSON.parse(readFileSync('edusafe/rules/version.json', 'utf8'))
 const contract = loadContract()
 
 import { validReport, QUOTE } from './helpers/valid-report.mjs'

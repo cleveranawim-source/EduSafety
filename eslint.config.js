@@ -13,6 +13,8 @@ export default tseslint.config(
       "coverage/**",
       ".vercel/**",
       "public/presentation/vendor/**",
+      // 스캐너가 잡아야 할 취약 코드를 일부러 담은 예제 앱 — lint 대상이 아니다
+      "skill/fixtures/**",
     ],
   },
   eslint.configs.recommended,
@@ -28,6 +30,11 @@ export default tseslint.config(
   {
     files: ["public/**/*.js"],
     languageOptions: { globals: globals.browser },
+  },
+  {
+    // 스킬 스크립트·테스트는 교사 PC의 Node에서 실행된다
+    files: ["skill/**/*.{js,mjs}"],
+    languageOptions: { globals: globals.node },
   },
   ...tseslint.configs.recommendedTypeChecked.map((config) => ({ ...config, files: ["**/*.ts"] })),
   {

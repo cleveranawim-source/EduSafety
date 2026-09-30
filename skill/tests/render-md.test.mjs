@@ -165,7 +165,6 @@ describe('renderMarkdown (REQ-8.20)', () => {
     const r = validReport()
     r.db_paths[0].table = 'a|b'
     const out = renderMarkdown(r, items)
-    const row = out.split('\n').find((l) => l.includes('a'))
     expect(out).not.toContain('| a|b |')
   })
 })
