@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import rules from '../src/data/securityRules.js'
 import { scanFiles, isScannablePath, countBySeverity, suspectDataFiles, maskSecret } from '../src/lib/scanner.js'
+import { redactSecrets } from '../src/lib/redact.js'
 
 const f = (path, text) => ({ path, name: path.split('/').pop(), text })
 const hit = (id, text) => {
@@ -96,6 +97,24 @@ describe('규칙 스캔 (T4 완료 기준)', () => {
     expect(env.occurrences[0].snippet).toBe('DB_PASSWORD=Sup3rS****s!')
     const conn = findings.find((x) => x.rule.id === 'connection-string-credentials')
     expect(conn.occurrences[0].snippet).not.toContain('Pa55w0rd!')
+  })
+
+  it('환경변수에서 읽는 코드·${} 치환은 비밀값 노출이 아니다 (오탐 회귀 방지)', () => {
+    const secretIds = ['env-secret-assignment', 'connection-string-credentials']
+    const hits = (path, text) => scanFiles([f(path, text)]).findings.filter((x) => secretIds.includes(x.rule.id)).length
+    // 올바른 방법 — 잡으면 안 된다
+    expect(hits('settings.py', 'SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]')).toBe(0)
+    expect(hits('settings.py', 'API_KEY = config.api_key')).toBe(0)
+    expect(hits('compose.yml', '      - DB_PASSWORD=${DB_PASSWORD}')).toBe(0)
+    expect(hits('compose.yml', '      - DATABASE_URL=postgres://app:${POSTGRES_PASSWORD}@db:5432/app')).toBe(0)
+    expect(hits('db.js', 'const uri = `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@db:5432/app`')).toBe(0)
+    expect(hits('deploy.sh', 'export API_KEY="$(cat key.txt)"')).toBe(0)
+    expect(hits('app.js', 'import x from "https://cdn.example.com:443/lib@1.2.3/x.js"')).toBe(0)
+    // 실제 리터럴 — 잡아야 한다
+    expect(hits('settings.py', 'SECRET_KEY = "django-insecure-abc123def456"')).toBe(1)
+    expect(hits('compose.yml', '      - DB_PASSWORD=realpassw0rd')).toBe(1)
+    expect(hits('app.js', 'const redisUrl = "redis://default:realP4ss@redis.example.com:6379"')).toBe(1)
+    expect(redactSecrets('SECRET_KEY = os.environ["X"]')).toBe('SECRET_KEY = os.environ["X"]')
   })
 
   it('apiKey: "AIza…"는 Firebase 설정 파일에서만 정보 등급, 그 밖에서는 Google 키 유출(심각)', () => {

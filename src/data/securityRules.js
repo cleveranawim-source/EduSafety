@@ -80,13 +80,16 @@ const rules = [
     fix: '비밀값은 서버 환경변수로 옮기고 클라이언트에는 두지 마세요.' },
   { id: 'env-secret-assignment', severity: 'critical', maskSecret: true, ruleFor: 'R-secrets',
     title: '환경변수 파일(.env)의 비밀값이 저장소에 포함됨 (KEY=값)',
-    pattern: /^\s*(?:export\s+|-\s+)?[A-Z0-9_]*(?:SECRET|PASSWORD|PASSWD|TOKEN|API_?KEY|PRIVATE_KEY|SERVICE_ROLE|ACCESS_KEY|_PW|_KEY)\s*=\s*(?:"([^"\n]{6,})"|'([^'\n]{6,})'|([^\s'"#]{6,}))/gm,
+    // 값이 리터럴일 때만 잡는다. 따옴표 없는 값은 .env·셸처럼 '=' 양옆에 공백이 없을 때만 리터럴로 본다 —
+    // 코드의 SECRET_KEY = os.environ[...] 같은 식(올바른 방법)과 ${VAR}·$(...) 치환은 비밀값이 아니다.
+    pattern: /^\s*(?:export\s+|-\s+)?[A-Z0-9_]*(?:SECRET|PASSWORD|PASSWD|TOKEN|API_?KEY|PRIVATE_KEY|SERVICE_ROLE|ACCESS_KEY|_PW|_KEY)(?:\s*=\s*(?:"([^"\n$`]{6,})"|'([^'\n]{6,})')|=([^\s'"#$`(){}[\]]{6,}))/gm,
     skipFiles: (path) => DOC_FILES.test(path) || ENV_TEMPLATE.test(path),
     skipLine: PLACEHOLDER_VALUE,
     fix: '.env 파일은 .gitignore에 넣고 저장소에서 제거하세요. 이미 올라간 값은 폐기·재발급하세요.' },
   { id: 'connection-string-credentials', severity: 'critical', maskSecret: true, ruleFor: 'R-secrets',
     title: 'DB·서비스 접속 문자열에 비밀번호 포함 (user:password@host)',
-    pattern: /\b[a-z][a-z0-9+.-]*:\/\/[^\s:/@'"]+:([^\s@'"]{3,})@/gi,
+    // 사용자·비밀번호 자리에 ${...} 치환이 오면 코드가 환경변수를 쓰는 것이므로 제외, '/'가 끼면 포트·경로다.
+    pattern: /\b[a-z][a-z0-9+.-]*:\/\/[^\s:/@'"`${}]+:([^\s@'"`${}/]{3,})@/gi,
     skipFiles: DOC_FILES,
     skipLine: /:(?:password|pass|pwd|secret|x+|\*+|<[^>]*>|\[[^\]]*\]|\$\{?[A-Z_]+\}?)@/i,
     fix: '접속 문자열은 서버 환경변수에만 두고, 노출됐다면 비밀번호를 바꾸세요.' },
