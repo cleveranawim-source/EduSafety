@@ -6,7 +6,7 @@ import { FEATURES, featureProfile, AUTHORITY_LABELS, RUBRIC_VERSION, rubricItems
 import { checkGate } from '../lib/submissionGate.js'
 import { readFolderFiles, computeFingerprint } from '../lib/localFolder.js'
 import { buildAiPayloadChunks } from '../lib/redact.js'
-import { suggestFeatures, judgeItems, deriveProtectionLevel, PROTECTION_LEVELS, DEFAULT_MODEL, MODEL_OPTIONS, emptyUsage } from '../lib/reviewAi.js'
+import { suggestFeatures, judgeItems, deriveProtectionLevel, PROTECTION_LEVELS, MODEL_OPTIONS, resolveModel, emptyUsage } from '../lib/reviewAi.js'
 import { issueCertificationBadge, settleCertificationRequest } from '../lib/certificationBadge.js'
 import { computeSummary, finalVerdict, naNeedsReason } from '../lib/reviewSummary.js'
 import { saveRecord, targetKey, syncRecordToServer } from '../lib/ledger.js'
@@ -46,7 +46,9 @@ export default function ReviewMode() {
 
   // 2단계
   const [apiKey, setApiKey] = useState(loadApiKey)
-  const [model, setModel] = useState(() => localStorage.getItem('edusafe_model') || DEFAULT_MODEL)
+  const [model, setModel] = useState(() => {
+    try { return resolveModel(localStorage.getItem('edusafe_model')) } catch { return resolveModel(null) }
+  })
   const [features, setFeatures] = useState({})
   const [aiSuggest, setAiSuggest] = useState(null)
 

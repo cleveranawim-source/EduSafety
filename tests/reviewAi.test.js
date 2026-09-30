@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { validateJudgments, deriveProtectionLevel, extractJson, estimateCost, addUsage, emptyUsage, filesNamedBy, scanHitItems, mergeJudgments, priceFor } from '../src/lib/reviewAi.js'
+import { validateJudgments, deriveProtectionLevel, extractJson, estimateCost, addUsage, emptyUsage, filesNamedBy, scanHitItems, mergeJudgments, priceFor, resolveModel, DEFAULT_MODEL, MODEL_OPTIONS } from '../src/lib/reviewAi.js'
 import { redactSecrets, buildAiPayload, buildAiPayloadChunks, withheldReason } from '../src/lib/redact.js'
 
 const files = [
@@ -207,7 +207,19 @@ describe('비용 집계 (심사 1건 비용 고지)', () => {
   it('응답의 model 이름(날짜 접미·대체 모델)으로 단가를 찾는다', () => {
     expect(priceFor('claude-sonnet-5-20260601').id).toBe('claude-sonnet-5')
     expect(priceFor('claude-fable-5-1').id).toBe('claude-fable-5-1')
-    expect(priceFor('claude-haiku-4-5-20251001').id).toBe('claude-sonnet-5')
-    expect(priceFor(undefined).id).toBe('claude-opus-5')
+    expect(priceFor('claude-haiku-4-5-20251001').id).toBe('claude-haiku-4-5')
+    expect(priceFor('claude-opus-5-5').id).toBe('claude-opus-5-5')
+    expect(priceFor('claude-opus-5').id).toBe('claude-opus-5')
+    expect(priceFor(undefined).id).toBe(DEFAULT_MODEL)
+    expect(estimateCost({ input_tokens: 1_000_000, output_tokens: 1_000_000 }, 'claude-opus-5-5')).toBeCloseTo(24, 6)
+  })
+
+  it('기본 모델은 Opus 5.5, 목록에서 빠진 예전 선택은 기본으로 옮긴다', () => {
+    expect(DEFAULT_MODEL).toBe('claude-opus-5-5')
+    expect(MODEL_OPTIONS.map((m) => m.id)).toEqual(['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-fable-5-1'])
+    expect(MODEL_OPTIONS.every((m) => m.fallbacks)).toBe(true)
+    expect(resolveModel('claude-opus-5')).toBe('claude-opus-5-5')
+    expect(resolveModel(null)).toBe('claude-opus-5-5')
+    expect(resolveModel('claude-fable-5-1')).toBe('claude-fable-5-1')
   })
 })

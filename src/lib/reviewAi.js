@@ -9,13 +9,29 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { FEATURES } from '../data/rubric.js'
 import { redactSecrets } from './redact.js'
 
-export const DEFAULT_MODEL = 'claude-opus-5'
-// 가격은 USD / 100만 토큰 (2026-06 기준 공식 단가). 캐시 쓰기는 입력의 1.25배.
+export const DEFAULT_MODEL = 'claude-opus-5-5'
+// 가격은 USD / 100만 토큰 (2026-09 기준 공식 단가). 캐시 쓰기는 입력의 1.25배.
+// 선택 목록은 현행 세대만 둔다. 세 모델 모두 안전 분류기의 거부가 있을 수 있어, 거부되면 서버가
+// 대체 모델로 이어 답하도록 fallbacks를 켠다 (심사 도중 코드 속 공격 문자열 때문에 끊기는 일을 줄인다).
 export const MODEL_OPTIONS = [
-  { id: 'claude-opus-5', label: 'Claude Opus 5 (기본 — 정밀 심사)', input: 5, output: 25, cacheRead: 0.5 },
-  { id: 'claude-sonnet-5', label: 'Claude Sonnet 5 (빠른 심사 — 저비용)', input: 2, output: 10, cacheRead: 0.2 },
-  { id: 'claude-fable-5-1', label: 'Claude Fable 5.1 (최고 정밀 — Opus의 2배 비용)', input: 10, output: 50, cacheRead: 0.25, fallbacks: true },
+  { id: 'claude-opus-5-5', label: 'Claude Opus 5.5 (기본 — 정밀 심사)', input: 4, output: 20, cacheRead: 0.2, fallbacks: true },
+  { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5 (빠른 심사 — 저비용)', input: 2, output: 10, cacheRead: 0.2, fallbacks: true },
+  { id: 'claude-fable-5-1', label: 'Claude Fable 5.1 (최고 정밀 — 기본의 2.5배 비용)', input: 10, output: 50, cacheRead: 0.25, fallbacks: true },
 ]
+
+// 비용 추정용 단가표 — 대체 모델이 답했거나 예전에 쓰던 모델로 기록된 호출도 제 단가로 매긴다.
+const PRICE_TABLE = [
+  ...MODEL_OPTIONS,
+  { id: 'claude-opus-5', input: 5, output: 25, cacheRead: 0.5 },
+  { id: 'claude-sonnet-5', input: 2, output: 10, cacheRead: 0.2 },
+  { id: 'claude-opus-4-8', input: 5, output: 25, cacheRead: 0.5 },
+  { id: 'claude-haiku-4-5', input: 1, output: 5, cacheRead: 0.1 },
+]
+
+// 브라우저에 저장된 예전 선택(claude-opus-5 등)이 목록에서 빠졌으면 기본 모델로 옮긴다.
+export function resolveModel(id) {
+  return MODEL_OPTIONS.some((o) => o.id === id) ? id : DEFAULT_MODEL
+}
 
 const VALID_VERDICTS = new Set(['ok', 'fail', 'needs_human', 'na'])
 // 인용이 이보다 짧으면 근거로 인정하지 않는다 — "import React" 같은 흔한 조각으로 통과하는 것을 막는다.
@@ -192,11 +208,11 @@ export function emptyUsage() {
 // 응답의 model 필드로 단가를 찾는다 — 대체 모델(fallback)로 답한 호출을 요청 모델 단가로 매기지 않게.
 export function priceFor(modelId) {
   const id = String(modelId || '')
-  return MODEL_OPTIONS.find((o) => o.id === id)
-    || MODEL_OPTIONS.find((o) => id.startsWith(o.id))
-    || MODEL_OPTIONS.find((o) => /fable/.test(id) && /fable/.test(o.id))
-    || MODEL_OPTIONS.find((o) => /sonnet|haiku/.test(id) && /sonnet/.test(o.id))
-    || MODEL_OPTIONS[0]
+  return PRICE_TABLE.find((o) => o.id === id)
+    || PRICE_TABLE.find((o) => id.startsWith(o.id))
+    || PRICE_TABLE.find((o) => /fable|mythos/.test(id) && /fable/.test(o.id))
+    || PRICE_TABLE.find((o) => /sonnet/.test(id) && /sonnet/.test(o.id))
+    || PRICE_TABLE.find((o) => o.id === DEFAULT_MODEL)
 }
 
 export function estimateCost(usage, modelId) {
@@ -248,7 +264,7 @@ function codeSystemBlock(codeText) {
 }
 
 // 구조화 출력 호출 — 스키마로 JSON을 강제하고 스트리밍으로 긴 응답의 타임아웃을 피한다.
-// Fable 5.1은 거부 시 서버가 대체 모델로 이어 답하도록 fallbacks를 켠다.
+// 거부(refusal) 시 서버가 대체 모델로 이어 답하도록 fallbacks를 켠다 (MODEL_OPTIONS의 fallbacks 표시).
 // onUsage는 실패한 시도·거부 응답을 포함해 모든 응답마다 불린다 — 비용 고지는 실제 청구와 같아야 한다.
 async function requestStructured(client, { model, maxTokens, effort, codeText, prompt, schema, onUsage }) {
   const option = MODEL_OPTIONS.find((o) => o.id === model)
