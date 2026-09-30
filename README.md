@@ -101,7 +101,8 @@ unset EDUSAFETY_ADMIN_PASSWORD_INPUT
 JavaScript 실행·로그인·사이트 크롤링·외부 스크립트 다운로드·익스플로잇은 수행하지 않습니다.
 Anthropic 보조 분석은 검사 화면에서 요청마다 `ANTHROPIC_API_KEY`를 입력하고 `ANTHROPIC_MODEL`을 선택할 때만
 실행합니다. 키는 저장하거나 API 응답에 포함하지 않습니다. 허용 모델은 `claude-sonnet-5`,
-`claude-haiku-4-5-20251001`, `claude-opus-5`이며, 모델을 생략하면 `claude-sonnet-5`를 사용합니다.
+`claude-haiku-4-5-20251001`, `claude-opus-5`, `claude-fable-5-1`이며, 모델을 생략하면 `claude-sonnet-5`를 사용합니다.
+(앱 심사 화면의 AI 판정은 심사자 브라우저에서 직접 호출하며, 기본 모델은 `claude-opus-5-5`입니다.)
 HTML 원문, URL, 응답 헤더 값은 Anthropic에 보내지 않고 서버가 확정한 finding ID·심각도·고정 개선안만
 전달합니다. 키를 입력하지 않거나 Anthropic 호출이 실패해도 규칙 기반 결과는 그대로 제공합니다. 기존
 `SECURITY_SCAN_ALLOWED_ORIGINS`는 URL 직접 입력을 끈 고정 대상 모드에서만 사용합니다.
