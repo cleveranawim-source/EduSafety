@@ -110,6 +110,8 @@ describe('규칙 스캔 (T4 완료 기준)', () => {
     expect(hits('db.js', 'const uri = `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@db:5432/app`')).toBe(0)
     expect(hits('deploy.sh', 'export API_KEY="$(cat key.txt)"')).toBe(0)
     expect(hits('app.js', 'import x from "https://cdn.example.com:443/lib@1.2.3/x.js"')).toBe(0)
+    expect(hits('.env.example', 'DATABASE_URL=postgresql://edusafety:change-me@127.0.0.1:5432/edusafety')).toBe(0)
+    expect(hits('config.js', 'const url = "postgres://app:change-me@localhost/app"')).toBe(0)
     // 실제 리터럴 — 잡아야 한다
     expect(hits('settings.py', 'SECRET_KEY = "django-insecure-abc123def456"')).toBe(1)
     expect(hits('compose.yml', '      - DB_PASSWORD=realpassw0rd')).toBe(1)

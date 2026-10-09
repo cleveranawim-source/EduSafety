@@ -90,8 +90,8 @@ const rules = [
     title: 'DB·서비스 접속 문자열에 비밀번호 포함 (user:password@host)',
     // 사용자·비밀번호 자리에 ${...} 치환이 오면 코드가 환경변수를 쓰는 것이므로 제외, '/'가 끼면 포트·경로다.
     pattern: /\b[a-z][a-z0-9+.-]*:\/\/[^\s:/@'"`${}]+:([^\s@'"`${}/]{3,})@/gi,
-    skipFiles: DOC_FILES,
-    skipLine: /:(?:password|pass|pwd|secret|x+|\*+|<[^>]*>|\[[^\]]*\]|\$\{?[A-Z_]+\}?)@/i,
+    skipFiles: (path) => DOC_FILES.test(path) || ENV_TEMPLATE.test(path),
+    skipLine: /:(?:password|pass|pwd|secret|change-?me|example|your[\w-]*|x+|\*+|<[^>]*>|\[[^\]]*\]|\$\{?[A-Z_]+\}?)@/i,
     fix: '접속 문자열은 서버 환경변수에만 두고, 노출됐다면 비밀번호를 바꾸세요.' },
   { id: 'vite-env-secret', severity: 'warning', ruleFor: 'R-secrets',
     title: 'VITE_ 접두 환경변수에 비밀값 (빌드 결과물에 그대로 노출됨)',
