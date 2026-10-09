@@ -2,7 +2,7 @@
 // severity: critical(심각) | warning(경고) | info(확인 필요)
 // maskSecret: 발견 스니펫에서 비밀값을 가린다 (신뢰성 원칙 7과 같은 정신)
 // skipFiles / skipLine: 실심사에서 확인된 오탐(문서 파일 안의 예시, XML 네임스페이스 URL 등)을 걸러낸다.
-// ruleFor: 이 규칙이 참고 입력이 되는 코어 루브릭 항목(core-1 id)
+// ruleFor: 이 규칙이 참고 입력이 되는 코어 루브릭 항목(core-2 id — skill/edusafe/rules/items.json)
 export const SEVERITIES = {
   critical: { label: '심각', color: 'var(--danger)' },
   warning: { label: '경고', color: 'var(--warn)' },
@@ -182,7 +182,7 @@ const rules = [
     title: 'localStorage에 개인정보 저장',
     pattern: /localStorage\.setItem\s*\(\s*['"`][^'"`]*(?:name|이름|phone|전화|email|birth|생년|학번|student)/gi,
     fix: '공용 기기에 남는 개인정보입니다. 세션 종료 시 지우거나 서버에만 보관하세요.' },
-  { id: 'console-log-personal', severity: 'info', ruleFor: 'S-minimal',
+  { id: 'console-log-personal', severity: 'info', ruleFor: 'S-log-pii',
     title: 'console.log에 개인정보로 보이는 값 출력',
     pattern: /console\.log\s*\([^)\n]*(?:이름|phone|전화|email|jumin|주민|password|비밀번호)/gi,
     fix: '개인정보를 콘솔에 남기지 마세요 — 브라우저 로그는 누구나 볼 수 있습니다.' },
@@ -197,7 +197,7 @@ const rules = [
     pattern: /api\.openai\.com|api\.anthropic\.com|generativelanguage\.googleapis\.com|api\.groq\.com/g,
     skipFiles: DOC_FILES,
     fix: '학생 입력이 외부 AI로 가면 그 사실을 알리고 개인정보 입력 금지를 안내하세요.' },
-  { id: 'analytics-tracker', severity: 'info', ruleFor: 'R-third-party',
+  { id: 'analytics-tracker', severity: 'info', ruleFor: 'S-tracking',
     title: '분석·광고 추적 스크립트',
     pattern: /googletagmanager\.com|google-analytics\.com|\bgtag\s*\(|\bfbq\s*\(/g,
     skipFiles: DOC_FILES,

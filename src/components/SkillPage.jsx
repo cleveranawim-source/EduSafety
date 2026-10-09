@@ -1,28 +1,30 @@
 // 트랙 1 — 교사용 자가점검 스킬 배포 안내.
 // 버전·해시는 skill/dist/manifest.json 에서 계산된 공식 값이며, public/download/ 의
 // 파일과 같은 배포본을 가리킨다. 스킬을 다시 빌드하면 이 세 값도 함께 고쳐야 한다.
-const VERSION = '0.1.0'
-const ZIP_SHA256 = 'ba50fad8d63986b8e0689ea5888ae5c3c57fe8a3116640dc24e14dc189684717'
-const SKILL_DIGEST = 'sha256:da7c4ee9f853a7a78c883c19051294e70e0175ce4fdb7e2a4df33e2ad807ba86'
+// 항목 수·카테고리는 심사 웹앱과 같은 정본(skill/edusafe/rules/items.json)에서 읽는다.
+import core from '../../skill/edusafe/rules/items.json' with { type: 'json' }
+
+const VERSION = '0.2.0'
+const ZIP_SHA256 = 'd4edfd15e1f13c183600059dd3b9de300518ee7592a64f96c9439b3a6f7a11ed'
+const SKILL_DIGEST = 'sha256:615106c0eea9e450f365f364b7310812ad3e961fd057a28d207b5cc34be4a66e'
+const ZIP_SIZE = '262KB'
 // 게시 파일명은 버전을 빼고 `edusafe.zip` 으로 둔다. 압축을 풀면 대부분의 도구가
 // 파일명과 같은 폴더를 만들기 때문에, 교사가 이름을 바꾸지 않아도 바로 `edusafe/` 가
-// 나온다. zip 안에 edusafe/ 를 한 겹 넣는 방법은 Windows 에서 edusafe-v0.1.0\edusafe\
+// 나온다. zip 안에 edusafe/ 를 한 겹 넣는 방법은 Windows 에서 edusafe-v<버전>\edusafe\
 // 처럼 두 겹이 되어 오히려 나쁘다. 빌드 산출물 이름(edusafe-v<버전>.zip)은 REQ-13.1
 // 이 정한 대로 유지하고, 게시할 때만 이름을 바꿔 복사한다. 바이트는 같으므로
 // ZIP_SHA256 도 그대로다.
 const ZIP_PATH = '/download/edusafe.zip'
 const SHA_PATH = '/download/edusafe.sha256'
 
-const CATEGORIES = [
-  { name: '1. 수집', note: '무엇을 모으나' },
-  { name: '2. 접근·권한', note: '누가 무엇을 할 수 있나' },
-  { name: '3. 비밀·파일 노출', note: '저장소·번들·히스토리에 뭐가 있나' },
-  { name: '4. 제3자 전송·추적', note: '데이터가 어디로 나가나' },
-  { name: '5. 화면·로그 노출', note: '눈에 어디까지 보이나' },
-  { name: '6. 코드 안전', note: '주입·검증 취약점' },
-  { name: '7. 고지·보유·파기', note: '알리고, 지키고, 지우나' },
-  { name: '8. 학생 안전', note: '미성년 보호 장치' },
-]
+// 정본 제목은 "수집 — 무엇을 모으나" 꼴이다. 부제가 없는 카테고리만 여기서 보충한다.
+const CATEGORY_NOTES = { 6: '주입·검증 취약점', 8: '미성년 보호 장치' }
+const CATEGORIES = core.categories.map((c) => {
+  const [name, note] = c.title.split(' — ')
+  return { name: `${c.number}. ${name}`, note: note || CATEGORY_NOTES[c.number] || '' }
+})
+const ITEM_COUNT = core.items.length
+const SUBCHECK_COUNT = core.items.reduce((n, i) => n + i.subchecks.length, 0)
 
 const INSTALL = [
   { tool: 'Claude Code', path: '~/.claude/skills/edusafe/', call: '/edusafe' },
@@ -66,7 +68,7 @@ export default function SkillPage() {
         </p>
 
         <div className="skill-get">
-          <a className="btn-primary" href={ZIP_PATH} download>⬇️ 스킬 내려받기 (258KB)</a>
+          <a className="btn-primary" href={ZIP_PATH} download>⬇️ 스킬 내려받기 ({ZIP_SIZE})</a>
           <div className="skill-get-meta">
             버전 <strong>v{VERSION}</strong> · 설치할 의존성 없음<br />
             Claude Code 또는 Codex CLI 필요 · Node 18+ 권장
@@ -77,7 +79,8 @@ export default function SkillPage() {
       <section className="about-section">
         <h2>무엇을 점검하나</h2>
         <p className="intro">
-          8개 카테고리 <strong>37개 항목</strong>, 하위 점검 134개. 항목마다 법령·고시·안내서의 근거를 조항 단위로 달았습니다.
+          {CATEGORIES.length}개 카테고리 <strong>{ITEM_COUNT}개 항목</strong>, 하위 점검 {SUBCHECK_COUNT}개. 항목마다 법령·고시·안내서의 근거를 조항 단위로 달았습니다.
+          기관 심사(⚖️ 심사)와 <strong>같은 기준</strong>이라, 여기서 미리 점검한 항목이 심사에서도 같은 이름으로 확인됩니다.
         </p>
         <div className="skill-cats">
           {CATEGORIES.map((c) => (

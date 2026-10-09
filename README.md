@@ -44,6 +44,16 @@
 install·build·test·lifecycle 코드를 실행하지 않으며, GitHub REST API로 commit과 tree·blob을 읽어
 고정된 서버 evaluator만 적용합니다.
 
+## 심사 기준 — 코어 루브릭 core-2
+
+교사 자가점검 스킬과 기관 심사 웹앱은 **같은 42개 항목**(9개 카테고리, 필수 15개)으로 심사합니다.
+항목 정의의 정본은 `skill/edusafe/rules/items.json` 하나이며, 웹앱은 이 파일을 그대로 읽습니다.
+스킬 쪽 설계 문서 §6이 이 파일의 원문이고 테스트가 둘을 양방향으로 대조합니다.
+웹앱은 여기에 심사 화면 전용 정보(기능별 적용 조건·보호 수준·법적 무게·쉬운 설명)만 덧붙입니다
+(`src/data/rubric.js`). 정본 중요도 `high`가 웹앱의 필수 항목이고, 교사 답변으로만 판정하는 항목은
+웹앱에서 심사자가 직접 판정합니다. 기준을 바꾸면 스킬 배포본(`npm --prefix skill run build:zip`)과
+`public/download/`, 스킬 소개 페이지의 버전·해시를 함께 갱신합니다.
+
 ## 로컬 실행
 
 Node.js 22 이상과 PostgreSQL 17을 준비합니다.

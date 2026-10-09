@@ -1,6 +1,6 @@
 {
-  "edusafe_version": "0.1.0",
-  "rubric_version": "1.2-skill",
+  "edusafe_version": "0.2.0",
+  "rubric_version": "core-2",
   "normalization": {
     "separator": "/",
     "eol": "LF",
@@ -16,15 +16,15 @@
   "files": [
     {
       "path": "README.md",
-      "sha256": "d33e9cdac5db95cdc484c283a2a2452507c8c560d162b8351ca4121ffd41bf6f"
+      "sha256": "648aabc79960906552301b87f6d2197442559664d8c250aa1feddc2485511296"
     },
     {
       "path": "SKILL.md",
-      "sha256": "f7d5a488c5c008205d5f3d00f2d818e9bad66691c84f9762c67e1e17b33b9180"
+      "sha256": "697595a15d461602f7363a314d294fa1951f638b9e4e15dabde364679f0874e0"
     },
     {
       "path": "rules/items.json",
-      "sha256": "5f931f0e0b4cfbe9c2049649b729c73a4e9040187ce7d6211bcf61481aecbd12"
+      "sha256": "d81af74e331558a3d7a5ed068bf7baabbdcd426f1d10a6189103f8b5a6ad16e2"
     },
     {
       "path": "rules/moe-checklist.json",
@@ -32,7 +32,7 @@
     },
     {
       "path": "rules/report.contract.json",
-      "sha256": "98f00426aeacf9403c3901b2fda17620ff2039975df3827f0942713d26048b64"
+      "sha256": "222aaf78e87dfb7dd0d2bba729c848d00d963d42e8e6273ebebfab7d7890dd56"
     },
     {
       "path": "rules/scan-rules.mjs",
@@ -40,15 +40,15 @@
     },
     {
       "path": "rules/session.json",
-      "sha256": "20469d0433bb3a9c7b3f6b5cb76df1a03d9a051c2a886bfac5bb78228ddee3dc"
+      "sha256": "5556a5d503d4c611ae45c213fa7fdb6b8aaa4106f3320c32bc3781e281120741"
     },
     {
       "path": "rules/version.json",
-      "sha256": "a0f1fd6c6a4a71d5143884a4c6a14ce47a04595f5783c61ad291ded37ab46889"
+      "sha256": "6c8b9b0a7597402742fb35c2a27a04e67238baa2d2fa845ebdc5fda1bedaef13"
     },
     {
       "path": "scripts/render.mjs",
-      "sha256": "f0bbb9aecd66f5866ab5196f81c6aa7ac765db7769a678b72869b14f0ea02364"
+      "sha256": "8a299f08fda3d64824c9826b8be23cf8f5e3b7837d9f0f86e2f8864ad1abbf6b"
     },
     {
       "path": "scripts/scan.mjs",
@@ -59,5 +59,5 @@
       "sha256": "401be066cc59a91f12ebf15cfd52a7bc023caf871c813220772b82f97947ff35"
     }
   ],
-  "skill_digest": "sha256:da7c4ee9f853a7a78c883c19051294e70e0175ce4fdb7e2a4df33e2ad807ba86"
+  "skill_digest": "sha256:615106c0eea9e450f365f364b7310812ad3e961fd057a28d207b5cc34be4a66e"
 }

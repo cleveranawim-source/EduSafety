@@ -76,18 +76,18 @@ describe('판정 집계 (신뢰성 원칙 3·4 + hackathon-2 적용 조건)', ()
     expect(s.score).toBeUndefined()
   })
 
-  // ── 적용 조건 (core-1) ──
+  // ── 적용 조건 (core-2) ──
   it('기능이 없으면 공통 15항목만 적용, 나머지는 조건 미해당', () => {
     const s = computeSummary(BASE, {}, {}, {})
     expect(s.items.length).toBe(15)
-    expect(s.inapplicable.length).toBe(22)
+    expect(s.inapplicable.length).toBe(27)
   })
 
-  it('기능을 켜면 해당 항목이 적용되고, 전부 켜면 37항목 전체가 적용된다', () => {
-    expect(computeSummary({ studentFacing: true }, {}, {}, {}).items.length).toBe(21)
-    expect(computeSummary({ studentFacing: true, handlesRealData: true }, {}, {}, {}).items.length).toBe(22)
+  it('기능을 켜면 해당 항목이 적용되고, 전부 켜면 42항목 전체가 적용된다', () => {
+    expect(computeSummary({ studentFacing: true }, {}, {}, {}).items.length).toBe(24)
+    expect(computeSummary({ studentFacing: true, handlesRealData: true }, {}, {}, {}).items.length).toBe(25)
     const all = { studentFacing: true, collectsPersonalInfo: true, collectsSensitiveInfo: true, hasAssessmentOrCompetition: true, handlesRealData: true, showsAiOutput: true, isLearningContent: true }
-    expect(computeSummary(all, {}, {}, {}).items.length).toBe(37)
+    expect(computeSummary(all, {}, {}, {}).items.length).toBe(42)
   })
 
   it('조건 미해당 항목은 판단불가·보류에 포함되지 않는다', () => {
