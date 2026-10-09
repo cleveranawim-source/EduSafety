@@ -6,12 +6,13 @@ import SkillPage from './components/SkillPage.jsx'
 import SecurityAuditPage from './components/SecurityAuditPage.jsx'
 
 // 순서가 곧 흐름이다 — 교사가 먼저 스스로 점검하고(스킬), 그다음 심사를 받는다.
+// 세 도구는 앱의 일생(만들 때·인증할 때·운영할 때)에 하나씩이고, 도구마다 색이 고정이다.
 const TABS = [
-  { key: 'about', label: '🏠 소개' },
-  { key: 'skill', label: '🧰 스킬' },
-  { key: 'review', label: '⚖️ 심사' },
-  { key: 'security', label: '🔎 URL 검사' },
-  { key: 'ledger', label: '📚 심사 기록' },
+  { key: 'about', icon: '🏠', label: '소개', tone: 'home' },
+  { key: 'skill', icon: '🧰', label: '스킬', note: '만들 때, 거울', tone: 'skill' },
+  { key: 'review', icon: '⚖️', label: '심사', note: '인증할 때, 저울', tone: 'review' },
+  { key: 'security', icon: '🔎', label: 'URL 검사', note: '운영할 때, 검진', tone: 'url' },
+  { key: 'ledger', icon: '📚', label: '심사 기록', tone: 'home' },
 ]
 
 export default function App() {
@@ -21,30 +22,37 @@ export default function App() {
     <div className="app">
       <header className="header">
         <button type="button" className="logo" onClick={() => setView('about')}>
-          🛡️ <strong>에듀 세이프</strong>
-          <span className="logo-sub">교사 제작 앱 심사·검수 시스템</span>
+          <span className="logo-mark" aria-hidden="true">🛡️</span>
+          <span className="logo-text">
+            <strong>에듀 세이프</strong>
+            <span className="logo-sub">교사 제작 앱 심사·검수 시스템</span>
+          </span>
         </button>
         <nav className="tabs" aria-label="주 메뉴">
           {TABS.map((t) => (
             <button
               type="button"
               key={t.key}
-              className={view === t.key ? 'tab active' : 'tab'}
+              className={`tab tone-${t.tone}${view === t.key ? ' active' : ''}`}
               aria-pressed={view === t.key}
               onClick={() => setView(t.key)}
             >
-              {t.label}
+              <span className="tab-icon" aria-hidden="true">{t.icon}</span>
+              <span className="tab-text">
+                <span className="tab-label">{t.label}</span>
+                {t.note && <small className="tab-note">{t.note}</small>}
+              </span>
             </button>
           ))}
         </nav>
       </header>
 
-      {/* 칠판(바깥) 위에 심사지(종이)를 놓는다 — 소개 화면만 칠판에 첫머리를 그린다 */}
+      {/* 앱 화면은 어두운 유리 패널, 인쇄해 제출하는 문서(보고서·요청서·검사 결과)만 흰 종이 */}
       <main className="main">
         {view === 'about' ? (
           <AboutPage onStart={() => setView('review')} onGo={setView} />
         ) : (
-          <div className="sheet">
+          <div className={`sheet tone-${TABS.find((t) => t.key === view)?.tone || 'home'}`}>
             {view === 'skill' && <SkillPage />}
             {view === 'review' && <ReviewMode />}
             {view === 'security' && <SecurityAuditPage />}

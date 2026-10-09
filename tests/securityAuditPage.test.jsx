@@ -74,7 +74,7 @@ describe('AI 보안 점검 화면', () => {
     const html = renderToStaticMarkup(createElement(App))
 
     expect(html).toContain('aria-label="주 메뉴"')
-    expect(html).toContain('🔎 URL 검사')
+    expect(html).toMatch(/aria-label="주 메뉴"[\s\S]*🔎[\s\S]*URL 검사/)
   })
 
   it('초기 화면에서 소유·허가 대상과 저영향 점검 경계를 먼저 알린다', () => {

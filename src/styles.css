@@ -2209,12 +2209,16 @@ a:focus-visible {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   바깥 배경 위에 심사지(종이)를 놓는다. 기억에 남길 요소는 하나: 첫 화면의 심사 도장.
-   같은 고리가 검사 진행 표시가 된다. 도구 색은 도구마다 고정(스킬·웹앱 심사·URL 검사).
-   색은 아래 토큰에만 있다 — 색을 바꾸려면 토큰만 바꾼다. 종이 안쪽 색은 위쪽 기본 토큰을 쓴다.
+   새벽 오로라 디자인 — 앱 화면 전체
+   원칙: 앱 화면은 남보라 바탕 위의 유리 패널, 인쇄해 제출하는 문서(심사 보고서·보완 요청서·
+   URL 검사 결과)만 흰 종이로 둔다. 기억에 남길 요소는 하나 — 첫 화면의 심사 도장, 같은 고리가
+   검사 진행 표시가 된다. 도구 색은 고정(스킬 살구 · 심사 청록 · URL 검사 하늘)이고 사이드바·
+   각 화면 머리에 같은 색이 이어진다. 색은 아래 토큰에만 있다 — 위쪽 예전 규칙도 이 토큰을 쓴다.
    ══════════════════════════════════════════════════════════════════ */
-/* 색상 — 새벽 오로라: 남보라 밤하늘에 청록·보라 빛, 도구 색은 살구(스킬)·청록(웹앱 심사)·하늘(URL 검사) */
 :root {
+  color-scheme: dark;
+
+  /* 바깥 배경과 도구 색 */
   --shell: #1a1d45;
   --shell-deep: #120f2e;
   --shell-glow-a: rgba(79, 224, 192, 0.14);
@@ -2225,19 +2229,66 @@ a:focus-visible {
   --tone-skill: #ffb38a;
   --tone-review: #4fe0c0;
   --tone-url: #8fb8ff;
+  --tone-home: #b4a8ff;
   --seal-light: #8ff5dd;
   --seal-mid: #3cc7b4;
   --seal-dark: #5b54d6;
   --seal-ink: #0d1035;
   --seal-glow: 79, 224, 192;
   --tile-shade: #0c0d2a;
-  --focus-shell: rgba(255, 179, 138, 0.9);
-  --tab-active-bg: var(--on-shell);
-  --tab-active-ink: var(--shell-deep);
-  --sheet-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 30px 64px -24px rgba(0, 0, 0, 0.6);
+
+  /* 앱 화면 기본 토큰 (예전 규칙이 쓰는 이름 그대로, 값만 어두운 화면용) */
+  --bg: rgba(255, 255, 255, 0.045);
+  --paper: rgba(255, 255, 255, 0.06);
+  --ink: #eef0fb;
+  --muted: #a9aed6;
+  --line: rgba(226, 228, 255, 0.14);
+  --primary: #4fe0c0;
+  --primary-deep: #9ff3de;
+  --primary-soft: rgba(79, 224, 192, 0.13);
+  --danger: #ff7c88;
+  --danger-soft: rgba(255, 124, 136, 0.13);
+  --warn: #ffc46b;
+  --warn-soft: rgba(255, 196, 107, 0.13);
+  --ok: #5fe3a1;
+  --on-accent: #0d1035;
+  --shadow: none;
+  --field: rgba(8, 10, 32, 0.5);
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-strong: rgba(255, 255, 255, 0.075);
+}
+
+/* 문서(종이) — 인쇄·제출하는 것만 밝게. 예전 밝은 값을 그대로 되살린다 */
+.report,
+.audit-results {
+  color-scheme: light;
+  --bg: #fdfbf7;
+  --paper: #ffffff;
+  --ink: #24312e;
+  --muted: #7d8a86;
+  --line: #e7e2d8;
+  --primary: #0e7a6a;
+  --primary-deep: #0a5c50;
+  --primary-soft: #e3f2ee;
+  --danger: #d64545;
+  --danger-soft: #fdeeee;
+  --warn: #e08a1f;
+  --warn-soft: #fdf3e3;
+  --ok: #2e9e6b;
+  --on-accent: #ffffff;
+  --shadow: 0 2px 12px rgba(36, 49, 46, 0.06);
+  --field: #fdfbf7;
+  --surface: #fdfbf7;
+  --surface-strong: #f6f2ea;
+  color: var(--ink);
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 30px 32px 34px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), 0 34px 70px -34px rgba(0, 0, 0, 0.75);
 }
 
 body {
+  color: var(--ink);
   background-color: var(--shell);
   background-image:
     radial-gradient(1100px 520px at 82% -10%, var(--shell-glow-a), transparent 62%),
@@ -2247,45 +2298,137 @@ body {
   min-height: 100vh;
 }
 
+::selection {
+  background: rgba(var(--seal-glow), 0.35);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 60%, transparent);
+  outline-offset: 3px;
+}
+
+a {
+  color: var(--primary-deep);
+}
+
+code {
+  color: inherit;
+}
+
+/* ── 뼈대: 왼쪽 도구 사이드바 + 오른쪽 화면 ── */
 .app {
-  max-width: 1040px;
+  max-width: 1320px;
+  padding: 22px 24px 40px;
 }
 
-/* ── 바깥 배경 위 머리줄 ── */
 .header {
-  border-bottom-color: var(--shell-line);
-  padding: 22px 0 16px;
-  margin-bottom: 26px;
+  border: 1px solid var(--shell-line);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 16px 12px;
+  margin: 0 0 22px;
 }
 
-.header .logo,
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-align: left;
+  color: var(--on-shell);
+  padding: 2px 6px;
+}
+
+.logo-mark {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  background: radial-gradient(circle at 30% 25%, var(--seal-light), var(--seal-mid) 60%, var(--seal-dark) 120%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 8px 20px -10px rgba(var(--seal-glow), 0.9);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
 .header .logo strong {
   color: var(--on-shell);
+  font-size: 1.08rem;
 }
 
 .header .logo-sub {
   color: var(--on-shell-dim);
+  font-size: 0.72rem;
 }
 
-.header .tab {
+.tab {
+  --tone: var(--tone-home);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-align: left;
+  padding: 7px 10px 7px 7px;
+  border-radius: 14px;
+  color: var(--on-shell-dim);
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: none;
+}
+
+.tab.tone-skill { --tone: var(--tone-skill); }
+.tab.tone-review { --tone: var(--tone-review); }
+.tab.tone-url { --tone: var(--tone-url); }
+
+.tab-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-size: 1.02rem;
+  background: color-mix(in srgb, var(--tone) 18%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.tab-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.tab-note {
+  font-size: 0.72rem;
+  font-weight: 500;
   color: var(--on-shell-dim);
 }
 
-.header .tab:hover {
+.tab:hover {
   color: var(--on-shell);
-  background: color-mix(in srgb, var(--on-shell) 8%, transparent);
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.header .tab.active {
-  background: var(--tab-active-bg);
-  color: var(--tab-active-ink);
+.tab.active {
+  color: var(--on-shell);
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 45%, transparent);
 }
 
-.header :focus-visible,
-.board-hero :focus-visible,
-.footer :focus-visible {
-  outline: 3px solid var(--focus-shell);
-  outline-offset: 3px;
+.tab.active .tab-icon {
+  background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--tone) 85%, white), color-mix(in srgb, var(--tone) 70%, var(--tile-shade)) 80%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 6px 16px -6px var(--tone);
 }
 
 .footer {
@@ -2293,24 +2436,391 @@ body {
   border-top-color: var(--shell-line);
 }
 
-/* ── 심사지: 바깥 배경 위에 놓인 종이 한 장 ── */
+@media (min-width: 1000px) {
+  .app {
+    display: grid;
+    grid-template-columns: 236px minmax(0, 1fr);
+    column-gap: 30px;
+    align-items: start;
+  }
+
+  .header {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    position: sticky;
+    top: 22px;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 18px;
+  }
+
+  .tabs {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .main,
+  .footer {
+    grid-column: 2;
+    min-width: 0;
+  }
+
+  .footer {
+    width: auto;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+    white-space: normal;
+    text-align: left;
+  }
+}
+
+@media (max-width: 999px) {
+  .app {
+    padding: 14px 14px 36px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    scrollbar-width: none;
+  }
+
+  .tab {
+    flex: none;
+    padding: 5px 10px 5px 5px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+  }
+
+  .tab-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    font-size: 0.88rem;
+  }
+
+  .tab-note {
+    display: none;
+  }
+}
+
+/* ── 화면 몸통: 유리 패널. 화면마다 도구 색이 머리 쪽에 은은하게 번진다 ── */
 .sheet {
-  background: var(--bg);
+  --tone: var(--tone-home);
   color: var(--ink);
-  border-radius: 22px;
-  padding: 30px 30px 36px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), var(--sheet-shadow);
 }
 
-.sheet > .panel {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
+.sheet.tone-skill { --tone: var(--tone-skill); }
+.sheet.tone-review { --tone: var(--tone-review); }
+.sheet.tone-url { --tone: var(--tone-url); }
+
+.panel,
+.sheet > .about > .hero {
+  background:
+    radial-gradient(700px 180px at 12% 0%, color-mix(in srgb, var(--tone) 13%, transparent), transparent 70%),
+    var(--surface);
+  border: 1px solid var(--line);
+  border-top-color: color-mix(in srgb, var(--tone) 40%, var(--line));
+  border-radius: 24px;
+  padding: 30px 30px 34px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+}
+
+.panel h1,
+.sheet > .about > .hero h1 {
+  font-size: 1.7rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.intro {
+  color: var(--muted);
+}
+
+.about-section h2,
+.report h3,
+.scan-box strong {
+  color: var(--ink);
+}
+
+/* ── 단계: 진행 막대 네 칸 ── */
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
   padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: left;
 }
 
-.sheet > .about-section:first-child {
+.step::before {
+  content: '';
+  width: 100%;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--line);
+}
+
+.step.done {
+  border: none;
+  background: none;
+  color: var(--primary-deep);
+}
+
+.step.done::before {
+  background: color-mix(in srgb, var(--primary) 65%, transparent);
+}
+
+.step.active {
+  border: none;
+  background: none;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.step.active::before {
+  background: linear-gradient(90deg, var(--seal-light), var(--seal-mid));
+  box-shadow: 0 0 14px rgba(var(--seal-glow), 0.6);
+}
+
+/* ── 버튼 ── */
+.btn-primary {
+  color: var(--seal-ink);
+  background: linear-gradient(135deg, var(--seal-light), var(--seal-mid) 70%);
+  border-radius: 12px;
+  font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 12px 26px -16px rgba(var(--seal-glow), 0.95);
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--seal-light), var(--seal-mid) 70%);
+  filter: brightness(1.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 14px 30px -14px rgba(var(--seal-glow), 1);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+}
+
+.btn-secondary:hover {
+  color: var(--primary-deep);
+  border-color: color-mix(in srgb, var(--primary) 70%, transparent);
+}
+
+.report .btn-primary,
+.audit-results .btn-primary {
+  color: #fff;
+  background: var(--primary);
+  box-shadow: none;
+  filter: none;
+}
+
+.report .btn-primary:hover:not(:disabled),
+.audit-results .btn-primary:hover:not(:disabled) {
+  background: var(--primary-deep);
+  box-shadow: none;
+  filter: none;
+}
+
+.report .btn-secondary,
+.audit-results .btn-secondary {
+  background: none;
+  color: var(--muted);
+}
+
+/* ── 입력 ── */
+.field input,
+.field select,
+.field textarea,
+.override-row select,
+.reason-input,
+.audit-form input,
+.audit-form select,
+.audit-ai-settings input,
+.audit-ai-settings select {
+  background-color: var(--field);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.field input::placeholder,
+.reason-input::placeholder,
+.audit-form input::placeholder {
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.field input:focus,
+.reason-input:focus {
+  outline: 2px solid color-mix(in srgb, var(--primary) 70%, transparent);
+  border-color: transparent;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--primary);
+}
+
+/* ── 상자·카드·칩 ── */
+.scan-box,
+.source-card,
+.item-card,
+.ledger-card,
+.info-card,
+.skill-cat,
+.cat-card {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+.scan-box {
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+
+.source-card {
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.item-card {
+  border-radius: 14px;
+}
+
+.item-card-muted {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ledger-card {
+  border-radius: 14px;
+}
+
+.info-card {
+  border-radius: 16px;
+}
+
+.repo-line code {
+  background: var(--surface-strong);
+}
+
+.sev,
+.verdict-chip {
+  color: var(--on-accent);
+}
+
+.chip {
+  background: var(--surface);
+}
+
+.chip-on {
+  background: var(--primary-soft);
+  color: var(--primary-deep);
+  border-color: color-mix(in srgb, var(--primary) 70%, transparent);
+}
+
+.gate-warn,
+.audit-risk-medium,
+.audit-ai-status-busy {
+  color: color-mix(in srgb, var(--warn) 70%, var(--ink));
+}
+
+.error,
+.audit-risk-high,
+.audit-ai-status-failed {
+  border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+}
+
+.audit-form .error,
+.audit-ai-status-failed {
+  color: var(--danger);
+}
+
+.audit-risk-medium,
+.audit-ai-status-busy {
+  border-color: color-mix(in srgb, var(--warn) 35%, transparent);
+}
+
+.upload-zone {
+  border-color: color-mix(in srgb, var(--primary) 60%, transparent);
+  border-radius: 16px;
+}
+
+.upload-zone:hover {
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.busy-live::before {
+  border-color: var(--primary-soft);
+  border-top-color: var(--primary);
+}
+
+.skill-get {
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.skill-limits {
+  border-color: color-mix(in srgb, var(--warn) 35%, transparent);
+}
+
+.round-badge {
+  color: var(--primary-deep);
+}
+
+/* 보고서 안에서 문서 요소가 유리 카드 규칙을 이어받지 않게 */
+.report .cat-card,
+.report .scan-box,
+.audit-results .scan-box {
+  background: var(--paper);
+}
+
+/* ── 첫 화면 몸통(소개 문단)은 패널 없이 바탕 위에 ── */
+.sheet.about {
+  background: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+.sheet.about > .about-section:first-child {
   margin-top: 0;
+}
+
+.sheet.about .about-section {
+  margin-top: 40px;
 }
 
 /* ── 첫 화면: 문장 + 심사 도장 + 세 도구 ── */
@@ -2457,8 +2967,9 @@ body {
 .track {
   --hue: var(--tone-review);
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 14px;
+  gap: 12px;
   text-align: left;
   padding: 18px 18px 18px 16px;
   border-radius: 20px;
@@ -2531,9 +3042,9 @@ body {
   margin: 16px 0;
   padding: 16px 18px;
   border-radius: 16px;
-  background: var(--paper);
-  border: 1px solid #cfe7df;
-  box-shadow: 0 12px 28px -20px rgba(14, 122, 106, 0.7);
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 40px -28px rgba(var(--seal-glow), 0.7);
 }
 
 .scan-ring {
@@ -2676,6 +3187,7 @@ body {
 .status-num.is-confirm strong { color: var(--warn); }
 .status-num.is-zero strong { color: #b9c2bf; }
 
+
 @media (max-width: 760px) {
   .board-hero {
     grid-template-columns: 1fr;
@@ -2690,9 +3202,23 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .sheet {
-    padding: 22px 16px 28px;
-    border-radius: 16px;
+  .panel,
+  .sheet > .about > .hero {
+    padding: 22px 16px 26px;
+    border-radius: 18px;
+  }
+
+  .report,
+  .audit-results {
+    padding: 22px 16px 26px;
+  }
+
+  .stepper {
+    gap: 6px;
+  }
+
+  .step {
+    font-size: 0.74rem;
   }
 }
 
@@ -2705,25 +3231,103 @@ body {
   }
 
   .seal-core,
-  .scan-ring-arc {
+  .scan-ring-arc,
+  .btn-primary {
     transition: none;
   }
 }
 
-/* 인쇄: 바깥 배경은 지우고 종이만 남긴다 */
+/* 인쇄: 바깥 배경·유리 패널은 지우고 종이만 남긴다. 혹시 문서 밖 글자가 찍혀도 읽히게 밝은 토큰으로 */
 @media print {
+  :root {
+    color-scheme: light;
+    --bg: #fdfbf7;
+    --paper: #ffffff;
+    --ink: #24312e;
+    --muted: #7d8a86;
+    --line: #e7e2d8;
+    --surface: #ffffff;
+  }
+
   body {
     background: #fff !important;
+    color: #24312e;
   }
 
   .board-hero {
     display: none !important;
   }
 
-  .sheet {
+  .app {
+    display: block;
+    padding: 0;
+  }
+
+  .panel,
+  .sheet > .about > .hero {
     background: none;
+    border: none;
     border-radius: 0;
     padding: 0;
     box-shadow: none;
+  }
+
+  .report,
+  .audit-results {
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+
+/* ── 다듬기: 누르는 타일·판정 색 점·큰 지표 ── */
+/* 앱 기능 확인 — 체크박스 줄 대신 누르는 타일, 고르면 청록으로 */
+.panel .check-line {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.panel .check-line:hover {
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+.panel .check-line:has(input:checked) {
+  border-color: color-mix(in srgb, var(--primary) 70%, transparent);
+  background: var(--primary-soft);
+}
+
+/* 판정 개수 칩 — 판정마다 색 점 */
+.chip-ok::before,
+.chip-fail::before,
+.chip-needs_human::before,
+.chip-na::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 7px;
+  border-radius: 50%;
+  vertical-align: 1px;
+}
+
+.chip-ok::before { background: var(--ok); }
+.chip-fail::before { background: var(--danger); }
+.chip-needs_human::before { background: var(--warn); }
+.chip-na::before { background: var(--muted); }
+
+/* 심사 기록의 파일럿 지표 — 숫자를 크게 */
+.sheet.tone-home .cat-state {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel .check-line {
+    transition: none;
   }
 }

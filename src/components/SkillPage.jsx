@@ -158,7 +158,7 @@ export default function SkillPage() {
       </section>
 
       <section className="about-section">
-        <h2>알려진 한계 (v0.1)</h2>
+        <h2>알려진 한계 (v{VERSION})</h2>
         <div className="skill-limits">
           <h3>이 판이 아직 못 하는 것을 그대로 적습니다.</h3>
           <ul>
