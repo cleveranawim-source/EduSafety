@@ -145,9 +145,16 @@ export default function ReviewReport({ repoMeta, features, protectionLevel, appS
       <section className="report-status" style={{ borderColor: STATUS_COLORS[summary.status] }}>
         <div className="status-word" style={{ color: STATUS_COLORS[summary.status] }}>{STATUS_LABELS[summary.status]}</div>
         <div className="status-actions">
-          반드시 수정 <strong>{summary.actions.mustFix}</strong>건 ·
-          권장 수정 <strong>{summary.actions.shouldFix}</strong>건 ·
-          사람 확인 필요 <strong>{summary.actions.confirm}</strong>건
+          {[
+            ['must', '반드시 수정', summary.actions.mustFix],
+            ['should', '권장 수정', summary.actions.shouldFix],
+            ['confirm', '사람 확인 필요', summary.actions.confirm],
+          ].map(([key, label, n]) => (
+            <div key={key} className={`status-num is-${key}${n === 0 ? ' is-zero' : ''}`}>
+              <strong>{n}</strong>
+              <span>{label}</span>
+            </div>
+          ))}
         </div>
         {summary.status === 'hold' && <p className="hint">판단불가 항목이 남아 있어 종합 판정은 보류입니다 (원칙 3).</p>}
       </section>
@@ -155,7 +162,7 @@ export default function ReviewReport({ repoMeta, features, protectionLevel, appS
       <section>
         <h3>카테고리별 상태 프로필</h3>
         <div className="cat-grid">
-          {Object.entries(summary.categoryStates).map(([cat, state]) => (
+          {Object.keys(CATEGORIES).filter((cat) => cat in summary.categoryStates).map((cat) => [cat, summary.categoryStates[cat]]).map(([cat, state]) => (
             <div key={cat} className="cat-card" style={{ borderTopColor: STATE_COLORS[state] }}>
               <div className="cat-name">{CATEGORIES[cat]}</div>
               <div className="cat-state" style={{ color: STATE_COLORS[state] }}>{CATEGORY_STATE_LABELS[state]}</div>

@@ -1,4 +1,5 @@
 import { DATA_NOTICE_POINTS } from '../lib/dataNotice.js'
+import { rubricItems } from '../data/rubric.js'
 
 const WHY = [
   { icon: '⛰️', title: '우매함의 봉우리 문제', body: '바이브 코딩은 전문성 없이도 "작동하는 앱"을 즉시 만들어 줍니다. 화면이 돌아가는 순간 만든 사람은 자신이 무엇을 모르는지 모르는 지점에 서게 되고, 절벽 아래에 있는 것은 학생의 개인정보입니다.' },
@@ -22,6 +23,16 @@ const TRUST = [
   { icon: '🔒', title: '심사 도구 스스로 규칙 준수', body: '학생 데이터 파일은 AI에 전송하지 않고, 비밀키는 마스킹 후 전송하며, AI가 검토하지 못한 범위는 정직하게 고지합니다.' },
 ]
 
+// 세 도구 — 앱의 일생(만들 때·인증할 때·운영할 때)에 하나씩. 색은 도구마다 고정이다.
+const TRACKS = [
+  { key: 'skill', icon: '🧰', name: '스킬', role: '만들 때, 거울', hue: 'chalk',
+    body: '선생님 컴퓨터에서 배포 전에 스스로 점검합니다. 코드는 어디로도 보내지 않습니다.' },
+  { key: 'review', icon: '⚖️', name: '웹앱 심사', role: '인증할 때, 저울', hue: 'mint',
+    body: '심사자가 코드 증거로 항목별 판정을 확정하고, 커밋에 고정된 보고서를 냅니다.' },
+  { key: 'security', icon: '🔎', name: 'URL 검사', role: '운영할 때, 검진', hue: 'sky',
+    body: '배포된 주소의 공개 화면과 보안 헤더를 가볍게 살펴봅니다.' },
+]
+
 const LAWS = [
   { name: '초·중등교육법 제29조의2 + 학습지원 SW 선정기준', note: '이 심사의 법적 존재 이유 — 선정기준 준수·학운위 심의를 법률이 요구' },
   { name: '개인정보 보호법', note: '최소수집(16조)·만 14세 동의(22조의2)·주민번호(24조의2)·안전조치(29조)·파기(21조)' },
@@ -31,81 +42,116 @@ const LAWS = [
   { name: 'KISA 개발보안 가이드 / CWE', note: '보안약점의 공인 분류 — 자동 스캔 규칙의 근거' },
 ]
 
-export default function AboutPage({ onStart }) {
+export default function AboutPage({ onStart, onGo }) {
   return (
-    <div className="about">
-      <section className="hero">
-        <h1>선생님이 만든 앱,<br />증거로 검증합니다</h1>
-        <p className="intro">
-          에듀 세이프는 교사가 바이브 코딩으로 만든 앱을 공인 기관의 심사자가 심사하기 위한
-          심사자 전용 시스템입니다. AI가 코드에서 증거를 수집해 판정 초안을 만들고,
-          최종 판정은 사람이 합니다.
-        </p>
-        <button className="btn-primary" onClick={onStart}>⚖️ 심사 시작하기</button>
-      </section>
+    <>
+      <section className="board-hero">
+        <div className="board-hero-copy">
+          <h1>선생님이 만든 앱,<br />증거로 검증합니다</h1>
+          <p className="board-intro">
+            에듀 세이프는 교사가 바이브 코딩으로 만든 앱을 공인 기관의 심사자가 심사하기 위한
+            심사자 전용 시스템입니다. AI가 코드에서 증거를 수집해 판정 초안을 만들고,
+            최종 판정은 사람이 합니다.
+          </p>
+        </div>
 
-      <section className="about-section">
-        <h2>왜 필요한가</h2>
-        <div className="card-grid">
-          {WHY.map((c) => (
-            <div key={c.title} className="info-card">
-              <div className="info-icon">{c.icon}</div>
-              <strong>{c.title}</strong>
-              <p>{c.body}</p>
-            </div>
+        <button type="button" className="seal" onClick={onStart} aria-label="심사 시작하기">
+          <svg className="seal-ring" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <path id="seal-text-path" d="M100,100 m-79,0 a79,79 0 1,1 158,0 a79,79 0 1,1 -158,0" />
+            </defs>
+            <circle className="seal-ring-outer" cx="100" cy="100" r="95" />
+            <circle className="seal-ring-inner" cx="100" cy="100" r="66" />
+            <text className="seal-ring-text">
+              <textPath href="#seal-text-path" textLength="488" lengthAdjust="spacing">코드 증거로 판정 · 커밋에 고정 · 최종 판정은 사람 · 학생 정보 보호 ·</textPath>
+            </text>
+          </svg>
+          <span className="seal-core">
+            <span className="seal-icon" aria-hidden="true">⚖️</span>
+            <strong>심사 시작</strong>
+            <small>저장소 주소 하나로</small>
+          </span>
+        </button>
+
+        <div className="tracks">
+          {TRACKS.map((t) => (
+            <button type="button" key={t.key} className={`track track-${t.hue}`} onClick={() => onGo(t.key)}>
+              <span className="track-icon" aria-hidden="true">{t.icon}</span>
+              <span className="track-text">
+                <strong>{t.name}</strong>
+                <span className="track-role">{t.role}</span>
+                <span className="track-body">{t.body}</span>
+              </span>
+            </button>
           ))}
         </div>
+        <p className="tracks-note">스킬과 웹앱 심사는 같은 심사 기준({rubricItems.length}개 항목)으로 봅니다. 미리 점검한 항목이 심사에서도 같은 이름으로 나옵니다.</p>
       </section>
 
-      <section className="about-section">
-        <h2>심사 흐름</h2>
-        <ol className="flow-list">
-          {FLOW.map((f) => (
-            <li key={f.step}>
-              <span className="flow-step">{f.step}</span>
-              <div><strong>{f.title}</strong><p>{f.body}</p></div>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <div className="sheet about">
+        <section className="about-section">
+          <h2>왜 필요한가</h2>
+          <div className="card-grid">
+            {WHY.map((c) => (
+              <div key={c.title} className="info-card">
+                <div className="info-icon">{c.icon}</div>
+                <strong>{c.title}</strong>
+                <p>{c.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <section className="about-section">
-        <h2>신뢰의 장치</h2>
-        <div className="card-grid">
-          {TRUST.map((c) => (
-            <div key={c.title} className="info-card">
-              <div className="info-icon">{c.icon}</div>
-              <strong>{c.title}</strong>
-              <p>{c.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+        <section className="about-section">
+          <h2>심사 흐름</h2>
+          <ol className="flow-list">
+            {FLOW.map((f) => (
+              <li key={f.step}>
+                <span className="flow-step">{f.step}</span>
+                <div><strong>{f.title}</strong><p>{f.body}</p></div>
+              </li>
+            ))}
+          </ol>
+        </section>
 
-      <section className="about-section">
-        <h2>제출된 코드는 어떻게 처리되나 (제작 교사님께)</h2>
-        <ul className="law-list">
-          {DATA_NOTICE_POINTS.map((p) => (
-            <li key={p.title}><strong>{p.title}</strong> — {p.body}</li>
-          ))}
-        </ul>
-        <p className="hint">같은 내용이 심사 화면의 "제출 교사용 안내문"과 심사 보고서에도 표기됩니다 — 심사 도구가 스스로 개인정보 원칙을 지킵니다.</p>
-      </section>
+        <section className="about-section">
+          <h2>신뢰의 장치</h2>
+          <div className="card-grid">
+            {TRUST.map((c) => (
+              <div key={c.title} className="info-card">
+                <div className="info-icon">{c.icon}</div>
+                <strong>{c.title}</strong>
+                <p>{c.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <section className="about-section">
-        <h2>심사 기준의 법령·공식 근거</h2>
-        <ul className="law-list">
-          {LAWS.map((l) => (
-            <li key={l.name}><strong>{l.name}</strong> — {l.note}</li>
-          ))}
-        </ul>
-        <p className="hint">모든 루브릭 항목에 법적 무게(법률/고시·훈령/공식 권고/모범 사례)를 표기해 "법적 의무"와 "권고"를 섞어 말하지 않습니다.</p>
-      </section>
+        <section className="about-section">
+          <h2>제출된 코드는 어떻게 처리되나 (제작 교사님께)</h2>
+          <ul className="law-list">
+            {DATA_NOTICE_POINTS.map((p) => (
+              <li key={p.title}><strong>{p.title}</strong> — {p.body}</li>
+            ))}
+          </ul>
+          <p className="hint">같은 내용이 심사 화면의 "제출 교사용 안내문"과 심사 보고서에도 표기됩니다 — 심사 도구가 스스로 개인정보 원칙을 지킵니다.</p>
+        </section>
 
-      <section className="about-cta">
-        <p>심사할 앱이 있다면, 저장소 주소 하나로 시작할 수 있습니다.</p>
-        <button className="btn-primary" onClick={onStart}>⚖️ 심사 시작하기</button>
-      </section>
-    </div>
+        <section className="about-section">
+          <h2>심사 기준의 법령·공식 근거</h2>
+          <ul className="law-list">
+            {LAWS.map((l) => (
+              <li key={l.name}><strong>{l.name}</strong> — {l.note}</li>
+            ))}
+          </ul>
+          <p className="hint">모든 루브릭 항목에 법적 무게(법률/고시·훈령/공식 권고/모범 사례)를 표기해 "법적 의무"와 "권고"를 섞어 말하지 않습니다.</p>
+        </section>
+
+        <section className="about-cta">
+          <p>심사할 앱이 있다면, 저장소 주소 하나로 시작할 수 있습니다.</p>
+          <button className="btn-primary" onClick={onStart}>⚖️ 심사 시작하기</button>
+        </section>
+      </div>
+    </>
   )
 }

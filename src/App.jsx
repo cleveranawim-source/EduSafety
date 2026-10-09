@@ -39,12 +39,18 @@ export default function App() {
         </nav>
       </header>
 
+      {/* 칠판(바깥) 위에 심사지(종이)를 놓는다 — 소개 화면만 칠판에 첫머리를 그린다 */}
       <main className="main">
-        {view === 'about' && <AboutPage onStart={() => setView('review')} />}
-        {view === 'skill' && <SkillPage />}
-        {view === 'review' && <ReviewMode />}
-        {view === 'security' && <SecurityAuditPage />}
-        {view === 'ledger' && <ReviewLedger />}
+        {view === 'about' ? (
+          <AboutPage onStart={() => setView('review')} onGo={setView} />
+        ) : (
+          <div className="sheet">
+            {view === 'skill' && <SkillPage />}
+            {view === 'review' && <ReviewMode />}
+            {view === 'security' && <SecurityAuditPage />}
+            {view === 'ledger' && <ReviewLedger />}
+          </div>
+        )}
       </main>
 
       <footer className="footer">

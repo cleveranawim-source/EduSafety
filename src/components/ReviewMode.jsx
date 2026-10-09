@@ -12,6 +12,7 @@ import { computeSummary, finalVerdict, naNeedsReason } from '../lib/reviewSummar
 import { saveRecord, targetKey, syncRecordToServer } from '../lib/ledger.js'
 import { buildTeacherNotice } from '../lib/dataNotice.js'
 import ReviewReport, { VERDICT_LABELS, verdictColor } from './ReviewReport.jsx'
+import ScanProgress from './ScanProgress.jsx'
 
 const mergeUsage = (a, b) => ({
   calls: a.calls + b.calls, input: a.input + b.input, output: a.output + b.output,
@@ -21,6 +22,14 @@ const mergeUsage = (a, b) => ({
 
 const STEPS = ['① 불러오기', '② 앱 확인', '③ 판정 확인', '④ 보고서']
 const API_KEY_STORAGE = 'edusafe_api_key'
+
+// 진행 표시에 쓰는 단계 — 지금 무엇을 하고 있고 몇 단계가 남았는지 보이게 한다.
+const PROGRESS_FLOWS = {
+  repo: { title: 'GitHub 저장소를 불러오는 중', steps: ['저장소와 커밋 확인', '파일 내려받기', '규칙 스캔·제출 게이트'] },
+  folder: { title: '제출 폴더를 읽는 중', steps: ['폴더 파일 읽기', 'SHA-256 콘텐츠 지문 계산', '규칙 스캔·제출 게이트'] },
+  suggest: { title: 'AI가 앱 기능을 확인하는 중', steps: ['비밀값을 가리고 코드 묶기', 'AI 기능 확인'] },
+  judge: { title: 'AI가 판정 초안을 쓰는 중', steps: ['비밀값을 가리고 코드 묶기', '항목별 판정 초안 작성', '근거 인용 대조'] },
+}
 
 // 심사자 API 키는 탭 세션에만 둔다 — localStorage는 같은 출처의 다른 페이지·XSS에 노출되고 지워지지 않는다.
 function loadApiKey() {
@@ -35,6 +44,7 @@ function loadApiKey() {
 export default function ReviewMode() {
   const [step, setStep] = useState(1)
   const [busy, setBusy] = useState('')
+  const [progress, setProgress] = useState(null) // { flow, step, percent }
   const [error, setError] = useState('')
 
   // 1단계
@@ -68,6 +78,8 @@ export default function ReviewMode() {
   const runRef = useRef(0)
   const certReqRef = useRef(0)
   const stillCurrent = (run) => run === runRef.current
+  const track = (flow, step, percent = null) => setProgress({ flow, step, percent })
+  const finish = () => { setBusy(''); setProgress(null) }
 
   const copyTeacherNotice = async () => {
     try {
@@ -97,14 +109,17 @@ export default function ReviewMode() {
     const run = runRef.current
     setError('')
     try {
-      setBusy('폴더 파일 읽는 중…')
+      track('folder', 0)
+      setBusy(`파일 ${fileList.length}개 확인 중`)
       const { files: read, skippedCount, skippedPaths, scannableSkipped } = await readFolderFiles(fileList)
       if (read.length === 0) throw new Error('검사할 수 있는 파일이 없어요.')
-      setBusy('SHA-256 콘텐츠 지문 계산 중…')
+      track('folder', 1)
+      setBusy(`파일 ${read.length}개의 경로·내용으로 지문 계산`)
       const fingerprint = await computeFingerprint(read)
       const name = (fileList[0].webkitRelativePath || '제출 폴더').split('/')[0]
       const meta = { source: 'folder', name, fingerprint, skippedCount, skippedPaths, scannableSkipped }
-      setBusy(`규칙 스캔 중… (파일 ${read.length}개)`)
+      track('folder', 2)
+      setBusy(`파일 ${read.length}개`)
       await new Promise((r) => setTimeout(r, 30))
       if (!stillCurrent(run)) return
       setRepoMeta(meta)
@@ -114,7 +129,7 @@ export default function ReviewMode() {
     } catch (err) {
       if (stillCurrent(run)) setError(err.message)
     } finally {
-      if (stillCurrent(run)) setBusy('')
+      if (stillCurrent(run)) finish()
     }
   }
 
@@ -124,15 +139,17 @@ export default function ReviewMode() {
     const run = runRef.current
     setError('')
     try {
-      setBusy('저장소 불러오는 중…')
-      const result = await fetchRepoFiles({ ...parsed, onProgress: (d, t) => { if (stillCurrent(run)) setBusy(`파일 내려받는 중… ${d}/${t}`) } })
+      track('repo', 0)
+      setBusy(`${parsed.owner}/${parsed.repo}`)
+      const result = await fetchRepoFiles({ ...parsed, onProgress: (d, t) => { if (stillCurrent(run)) { track('repo', 1, Math.round((d / t) * 100)); setBusy(`${d} / ${t}개`) } } })
       if (result.files.length === 0) throw new Error('검사할 수 있는 파일이 없어요.')
       const meta = {
         owner: parsed.owner, repo: parsed.repo, branch: result.branch, commitSha: result.commitSha,
         skippedCount: result.skippedCount, skippedPaths: result.skippedPaths, scannableSkipped: result.scannableSkipped,
         failedPaths: result.failedPaths || [], treeTruncated: result.treeTruncated,
       }
-      setBusy(`규칙 스캔 중… (파일 ${result.files.length}개)`)
+      track('repo', 2)
+      setBusy(`파일 ${result.files.length}개`)
       await new Promise((r) => setTimeout(r, 30))
       if (!stillCurrent(run)) return
       setRepoMeta(meta)
@@ -142,7 +159,7 @@ export default function ReviewMode() {
     } catch (err) {
       if (stillCurrent(run)) setError(err.message)
     } finally {
-      if (stillCurrent(run)) setBusy('')
+      if (stillCurrent(run)) finish()
     }
   }
 
@@ -150,8 +167,11 @@ export default function ReviewMode() {
     const run = runRef.current
     setError('')
     try {
+      track('suggest', 0)
+      setBusy('…')
       const { chunks } = buildAiPayloadChunks(files)
-      setBusy(chunks.length > 1 ? `AI가 앱 기능을 확인하는 중… 코드 ${chunks.length}개 묶음 전체를 봅니다` : 'AI가 앱 기능을 확인하는 중…')
+      track('suggest', 1)
+      setBusy(chunks.length > 1 ? `코드 ${chunks.length}개 묶음 전체를 봅니다` : '…')
       const result = await suggestFeatures({ payloadChunks: chunks, apiKey, model })
       if (!stillCurrent(run)) return
       setAiSuggest(result)
@@ -160,7 +180,7 @@ export default function ReviewMode() {
     } catch (err) {
       if (stillCurrent(run)) setError(`AI 제안 실패: ${err.message} — 체크박스로 직접 확인할 수 있어요.`)
     } finally {
-      if (stillCurrent(run)) setBusy('')
+      if (stillCurrent(run)) finish()
     }
   }
 
@@ -171,13 +191,19 @@ export default function ReviewMode() {
     const run = runRef.current
     setError('')
     try {
+      track('judge', 0)
+      setBusy('…')
       const payload = buildAiPayloadChunks(files)
       const many = payload.chunks.length > 1
-      setBusy(many ? `AI가 판정 초안을 작성하는 중… 코드가 커서 ${payload.chunks.length}개 묶음으로 나눠 분석합니다 (수 분)` : 'AI가 항목별 판정 초안을 작성하는 중… (1~2분)')
+      track('judge', 1, many ? 0 : null)
+      setBusy(many ? `코드가 커서 ${payload.chunks.length}개 묶음으로 나눠 분석합니다 (수 분)` : '1~2분 걸립니다')
       const aiItems = aiRan ? pendingAiItems : summary.items.filter((it) => it.aiVerifiable)
       const result = await judgeItems({
         payloadChunks: payload.chunks, items: aiItems, scanFindings: scan.findings, apiKey, model, files,
-        onProgress: (d, t) => { if (t > 1 && stillCurrent(run)) setBusy(`AI 분할 분석 중… ${d}/${t} 묶음 완료`) },
+        onProgress: (d, t) => {
+          if (!stillCurrent(run)) return
+          if (d === t) { track('judge', 2); setBusy('AI가 인용한 코드를 원문과 맞춰 봅니다') } else if (t > 1) { track('judge', 1, Math.round((d / t) * 100)); setBusy(`${d} / ${t}개 묶음 완료`) }
+        },
       })
       if (!stillCurrent(run)) return
       setJudgments((prev) => ({ ...prev, ...result.judgments }))
@@ -191,7 +217,7 @@ export default function ReviewMode() {
     } catch (err) {
       if (stillCurrent(run)) setError(`AI 판정 실패: ${err.message}`)
     } finally {
-      if (stillCurrent(run)) setBusy('')
+      if (stillCurrent(run)) finish()
     }
   }
 
@@ -227,7 +253,7 @@ export default function ReviewMode() {
 
   const resetAll = () => {
     runRef.current++
-    setStep(1); setRepoUrl(''); setRepoMeta(null); setFiles([]); setScan(null); setGate(null); setBusy('')
+    setStep(1); setRepoUrl(''); setRepoMeta(null); setFiles([]); setScan(null); setGate(null); setBusy(''); setProgress(null)
     setFeatures({}); setAiSuggest(null)
     setJudgments({}); setAiMeta(null); setAiRan(false); setOverrides({}); setHumanInputs({}); setFilter('')
     setSavedRound(null); setUsage(emptyUsage()); setCertification(null); setServerSync(null); setError('')
@@ -280,12 +306,13 @@ export default function ReviewMode() {
 
       {error && <div className="error">⚠️ {error}</div>}
       {busy && (
-        <div className="busy busy-live">
-          <div>
-            <strong>검사 진행 중</strong> — {busy}
-            <div className="hint">진행 중에는 이 화면을 닫거나 새로고침하지 마세요.</div>
-          </div>
-        </div>
+        <ScanProgress
+          title={PROGRESS_FLOWS[progress?.flow]?.title || '검사 진행 중'}
+          steps={PROGRESS_FLOWS[progress?.flow]?.steps || []}
+          step={progress?.step ?? 0}
+          percent={progress?.percent}
+          detail={busy === '…' ? '' : busy}
+        />
       )}
 
       {/* ── ① 불러오기 ── */}
