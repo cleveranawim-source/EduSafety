@@ -2209,26 +2209,40 @@ a:focus-visible {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   칠판과 심사지 — 바깥은 교실 칠판, 심사 내용은 그 위에 놓인 종이.
-   기억에 남길 요소는 하나: 첫 화면의 심사 도장. 같은 고리가 검사 진행 표시가 된다.
-   도구 색은 고정 — 스킬 분필 노랑 · 웹앱 심사 민트 · URL 검사 하늘.
+   바깥 배경 위에 심사지(종이)를 놓는다. 기억에 남길 요소는 하나: 첫 화면의 심사 도장.
+   같은 고리가 검사 진행 표시가 된다. 도구 색은 도구마다 고정(스킬·웹앱 심사·URL 검사).
+   색은 아래 토큰에만 있다 — 색을 바꾸려면 토큰만 바꾼다. 종이 안쪽 색은 위쪽 기본 토큰을 쓴다.
    ══════════════════════════════════════════════════════════════════ */
+/* 색상 — 새벽 오로라: 남보라 밤하늘에 청록·보라 빛, 도구 색은 살구(스킬)·청록(웹앱 심사)·하늘(URL 검사) */
 :root {
-  --board: #1e3d35;
-  --board-deep: #16302a;
-  --board-line: rgba(243, 240, 230, 0.12);
-  --chalk: #f3f0e6;
-  --chalk-dim: #b4c7bf;
-  --chalk-mint: #6fd8b9;
-  --chalk-yellow: #f3cf63;
-  --chalk-sky: #8cc8f0;
+  --shell: #1a1d45;
+  --shell-deep: #120f2e;
+  --shell-glow-a: rgba(79, 224, 192, 0.14);
+  --shell-glow-b: rgba(167, 139, 250, 0.16);
+  --shell-line: rgba(226, 228, 255, 0.12);
+  --on-shell: #f1f1fb;
+  --on-shell-dim: #b9bddf;
+  --tone-skill: #ffb38a;
+  --tone-review: #4fe0c0;
+  --tone-url: #8fb8ff;
+  --seal-light: #8ff5dd;
+  --seal-mid: #3cc7b4;
+  --seal-dark: #5b54d6;
+  --seal-ink: #0d1035;
+  --seal-glow: 79, 224, 192;
+  --tile-shade: #0c0d2a;
+  --focus-shell: rgba(255, 179, 138, 0.9);
+  --tab-active-bg: var(--on-shell);
+  --tab-active-ink: var(--shell-deep);
+  --sheet-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 30px 64px -24px rgba(0, 0, 0, 0.6);
 }
 
 body {
-  background-color: var(--board);
+  background-color: var(--shell);
   background-image:
-    radial-gradient(1100px 520px at 80% -10%, rgba(111, 216, 185, 0.1), transparent 62%),
-    linear-gradient(180deg, var(--board) 0, var(--board-deep) 100%);
+    radial-gradient(1100px 520px at 82% -10%, var(--shell-glow-a), transparent 62%),
+    radial-gradient(900px 480px at -5% 20%, var(--shell-glow-b), transparent 60%),
+    linear-gradient(180deg, var(--shell) 0, var(--shell-deep) 100%);
   background-attachment: fixed;
   min-height: 100vh;
 }
@@ -2237,58 +2251,55 @@ body {
   max-width: 1040px;
 }
 
-/* ── 칠판 위 머리줄 ── */
+/* ── 바깥 배경 위 머리줄 ── */
 .header {
-  border-bottom-color: var(--board-line);
+  border-bottom-color: var(--shell-line);
   padding: 22px 0 16px;
   margin-bottom: 26px;
 }
 
 .header .logo,
 .header .logo strong {
-  color: var(--chalk);
+  color: var(--on-shell);
 }
 
 .header .logo-sub {
-  color: var(--chalk-dim);
+  color: var(--on-shell-dim);
 }
 
 .header .tab {
-  color: var(--chalk-dim);
+  color: var(--on-shell-dim);
 }
 
 .header .tab:hover {
-  color: var(--chalk);
-  background: rgba(243, 240, 230, 0.08);
+  color: var(--on-shell);
+  background: color-mix(in srgb, var(--on-shell) 8%, transparent);
 }
 
 .header .tab.active {
-  background: var(--chalk);
-  color: var(--board-deep);
+  background: var(--tab-active-bg);
+  color: var(--tab-active-ink);
 }
 
 .header :focus-visible,
 .board-hero :focus-visible,
 .footer :focus-visible {
-  outline: 3px solid rgba(243, 207, 99, 0.85);
+  outline: 3px solid var(--focus-shell);
   outline-offset: 3px;
 }
 
 .footer {
-  color: var(--chalk-dim);
-  border-top-color: var(--board-line);
+  color: var(--on-shell-dim);
+  border-top-color: var(--shell-line);
 }
 
-/* ── 심사지: 칠판 위에 놓인 종이 한 장 ── */
+/* ── 심사지: 바깥 배경 위에 놓인 종이 한 장 ── */
 .sheet {
   background: var(--bg);
   color: var(--ink);
   border-radius: 22px;
   padding: 30px 30px 36px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 2px 6px rgba(0, 0, 0, 0.18),
-    0 28px 60px -24px rgba(0, 0, 0, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), var(--sheet-shadow);
 }
 
 .sheet > .panel {
@@ -2302,14 +2313,14 @@ body {
   margin-top: 0;
 }
 
-/* ── 첫 화면: 칠판에 쓴 문장 + 심사 도장 + 세 도구 ── */
+/* ── 첫 화면: 문장 + 심사 도장 + 세 도구 ── */
 .board-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
   align-items: center;
   gap: 22px 40px;
   padding: 14px 4px 34px;
-  color: var(--chalk);
+  color: var(--on-shell);
 }
 
 .board-hero h1 {
@@ -2322,7 +2333,7 @@ body {
 }
 
 .board-intro {
-  color: var(--chalk-dim);
+  color: var(--on-shell-dim);
   font-size: 1.04rem;
   line-height: 1.75;
   max-width: 33em;
@@ -2338,8 +2349,8 @@ body {
   padding: 0;
   display: grid;
   place-items: center;
-  color: var(--chalk);
-  background: radial-gradient(circle, rgba(111, 216, 185, 0.16), transparent 70%);
+  color: var(--on-shell);
+  background: radial-gradient(circle, rgba(var(--seal-glow), 0.16), transparent 70%);
 }
 
 .seal-ring {
@@ -2353,20 +2364,20 @@ body {
 
 .seal-ring-outer {
   fill: none;
-  stroke: var(--chalk-mint);
+  stroke: var(--tone-review);
   stroke-width: 2;
   opacity: 0.85;
 }
 
 .seal-ring-inner {
   fill: none;
-  stroke: rgba(243, 240, 230, 0.35);
+  stroke: color-mix(in srgb, var(--on-shell) 35%, transparent);
   stroke-width: 1;
   stroke-dasharray: 2 5;
 }
 
 .seal-ring-text {
-  fill: var(--chalk-dim);
+  fill: var(--on-shell-dim);
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -2382,11 +2393,11 @@ body {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  color: #0f2b25;
-  background: radial-gradient(circle at 35% 30%, #94e8cf, #33a98b 55%, #1f7c66 100%);
+  color: var(--seal-ink);
+  background: radial-gradient(circle at 35% 30%, var(--seal-light), var(--seal-mid) 55%, var(--seal-dark) 100%);
   box-shadow:
-    0 0 0 6px rgba(111, 216, 185, 0.14),
-    0 0 46px rgba(111, 216, 185, 0.38),
+    0 0 0 6px rgba(var(--seal-glow), 0.14),
+    0 0 46px rgba(var(--seal-glow), 0.38),
     inset 0 2px 0 rgba(255, 255, 255, 0.45),
     inset 0 -10px 22px rgba(0, 0, 0, 0.18);
   transition: box-shadow 0.25s ease, transform 0.25s ease;
@@ -2412,8 +2423,8 @@ body {
 .seal:hover .seal-core {
   transform: scale(1.03);
   box-shadow:
-    0 0 0 8px rgba(111, 216, 185, 0.2),
-    0 0 64px rgba(111, 216, 185, 0.55),
+    0 0 0 8px rgba(var(--seal-glow), 0.2),
+    0 0 64px rgba(var(--seal-glow), 0.55),
     inset 0 2px 0 rgba(255, 255, 255, 0.5),
     inset 0 -10px 22px rgba(0, 0, 0, 0.18);
 }
@@ -2444,17 +2455,17 @@ body {
 }
 
 .track {
-  --hue: var(--chalk-mint);
+  --hue: var(--tone-review);
   display: flex;
   align-items: flex-start;
   gap: 14px;
   text-align: left;
   padding: 18px 18px 18px 16px;
   border-radius: 20px;
-  color: var(--chalk);
+  color: var(--on-shell);
   background: rgba(255, 255, 255, 0.04);
   background: linear-gradient(160deg, color-mix(in srgb, var(--hue) 14%, transparent), rgba(255, 255, 255, 0.02));
-  border: 1px solid rgba(243, 240, 230, 0.16);
+  border: 1px solid var(--shell-line);
   border-color: color-mix(in srgb, var(--hue) 34%, transparent);
   transition: border-color 0.2s ease;
 }
@@ -2463,9 +2474,9 @@ body {
   border-color: color-mix(in srgb, var(--hue) 70%, transparent);
 }
 
-.track-chalk { --hue: var(--chalk-yellow); }
-.track-mint { --hue: var(--chalk-mint); }
-.track-sky { --hue: var(--chalk-sky); }
+.track-chalk { --hue: var(--tone-skill); }
+.track-mint { --hue: var(--tone-review); }
+.track-sky { --hue: var(--tone-url); }
 
 .track-icon {
   flex: none;
@@ -2476,7 +2487,7 @@ body {
   place-items: center;
   font-size: 1.55rem;
   background: var(--hue);
-  background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--hue) 82%, white), color-mix(in srgb, var(--hue) 70%, #0b1f1a) 78%);
+  background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--hue) 82%, white), color-mix(in srgb, var(--hue) 70%, var(--tile-shade)) 78%);
   box-shadow:
     inset 0 2px 0 rgba(255, 255, 255, 0.5),
     inset 0 -6px 12px rgba(0, 0, 0, 0.18),
@@ -2503,13 +2514,13 @@ body {
 .track-body {
   font-size: 0.86rem;
   line-height: 1.6;
-  color: var(--chalk-dim);
+  color: var(--on-shell-dim);
 }
 
 .tracks-note {
   grid-column: 1 / -1;
   font-size: 0.86rem;
-  color: var(--chalk-dim);
+  color: var(--on-shell-dim);
 }
 
 /* ── 검사 진행: 도장 고리 + 단계 체크 ── */
@@ -2699,7 +2710,7 @@ body {
   }
 }
 
-/* 인쇄: 칠판은 지우고 종이만 남긴다 */
+/* 인쇄: 바깥 배경은 지우고 종이만 남긴다 */
 @media print {
   body {
     background: #fff !important;
