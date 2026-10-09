@@ -48,7 +48,12 @@
     "H-retention": "needs_human",
     "H-breach-ready": "needs_human",
     "H-school-approval": "needs_human",
-    "R-crisis": "na"
+    "R-crisis": "na",
+    "S-ai-transparency": "na",
+    "S-ai-fallibility": "na",
+    "H-edu-fit": "needs_human",
+    "H-standards": "needs_human",
+    "H-usability": "needs_human"
   },
   "absence_proof_signals": {
     "R-rrn": ["rrn-data", "rrn-field"],

@@ -1,6 +1,6 @@
 {
   "schema_version": "1",
-  "rubric_version": "1.2-skill",
+  "rubric_version": "core-2",
   "categories": [
     {
       "number": 1,
@@ -33,6 +33,10 @@
     {
       "number": 8,
       "title": "학생 안전"
+    },
+    {
+      "number": 9,
+      "title": "교육 적절성 — 수업에 맞게 쓸 수 있나"
     }
   ],
   "items": [
@@ -1056,7 +1060,7 @@
     {
       "id": "R-llm-input",
       "category": 4,
-      "base_severity": "medium",
+      "base_severity": "high",
       "question": "학생 입력이 외부 AI로 전송되면 그 사실을 고지하고 개인정보 입력 금지를 안내한다",
       "methods": [
         "scanner",
@@ -1802,6 +1806,74 @@
       "fix_hint": "정규 수업에 쓸 계획이라면 미리 학교운영위원회 심의 대상인지 확인하고, 필요한 경우 심의를 신청하세요."
     },
     {
+      "id": "S-ai-transparency",
+      "category": 7,
+      "base_severity": "medium",
+      "question": "AI가 만든 결과물을 보여준다면 AI 기반이라는 사실을 미리 알리고, 결과물에 AI 생성 표시를 한다",
+      "methods": [
+        "code"
+      ],
+      "applicability": {
+        "na_when": "AI가 만든 결과물을 화면에 보여주지 않음"
+      },
+      "absence_proof": false,
+      "subchecks": [
+        {
+          "id": "ai-use-prior-notice",
+          "text": "앱이 AI로 동작한다는 사실을 사용 전에 알리는 안내",
+          "required_coverage": [
+            "code"
+          ],
+          "stacks": "all"
+        },
+        {
+          "id": "ai-output-label",
+          "text": "AI가 만든 글·그림·피드백 옆의 \"AI 생성\" 표시",
+          "required_coverage": [
+            "code"
+          ],
+          "stacks": "all"
+        }
+      ],
+      "basis": "인공지능기본법 제31조①②(이용자 사전 고지·생성형 AI 결과물 표시)",
+      "why_risky": "학생은 AI가 만든 글이나 그림을 선생님이나 친구가 만든 것으로 오해하기 쉽고, 틀린 내용도 사실처럼 받아들일 수 있습니다. 법은 생성형 AI의 결과물에 그 사실을 표시하도록 정하고 있습니다.",
+      "fix_hint": "앱 첫 화면이나 AI 기능 버튼 근처에 \"이 기능은 AI가 답을 만듭니다\" 같은 안내를 넣고, AI가 만든 결과물마다 \"AI 생성\" 표시를 붙이세요."
+    },
+    {
+      "id": "S-ai-fallibility",
+      "category": 7,
+      "base_severity": "low",
+      "question": "AI가 학생의 답·작품을 판정·채점·피드백한다면 \"틀릴 수 있다\"는 안내와 교사가 확인하는 경로가 있다",
+      "methods": [
+        "code"
+      ],
+      "applicability": {
+        "na_when": "AI가 학생의 답·작품을 판정·채점·피드백하지 않음"
+      },
+      "absence_proof": false,
+      "subchecks": [
+        {
+          "id": "ai-judgment-disclaimer",
+          "text": "AI 판정·채점·피드백 옆의 \"틀릴 수 있음\" 안내",
+          "required_coverage": [
+            "code"
+          ],
+          "stacks": "all"
+        },
+        {
+          "id": "teacher-review-path",
+          "text": "AI 판정에 이의를 제기하거나 교사가 확인하는 경로",
+          "required_coverage": [
+            "code"
+          ],
+          "stacks": "all"
+        }
+      ],
+      "basis": "교육분야 인공지능 윤리원칙(투명성·책임성) + 인공지능기본법 제34조①2·4(학생 평가 AI에 해당할 때 — 설명 방안·사람의 관리·감독)",
+      "why_risky": "AI의 채점이나 피드백도 틀릴 수 있는데, 아무 안내 없이 보여주면 학생이 잘못된 평가를 그대로 믿거나 억울한 결과를 바로잡을 길이 없습니다.",
+      "fix_hint": "AI 판정 결과 옆에 \"AI의 판단은 틀릴 수 있어요. 이상하면 선생님께 알려 주세요\" 같은 안내를 넣고, 최종 평가는 교사가 확인하도록 하세요."
+    },
+    {
       "id": "R-crisis",
       "category": 8,
       "base_severity": "high",
@@ -1834,6 +1906,108 @@
       "basis": "교육분야 인공지능 윤리원칙(안전 보장) + 청소년상담 1388",
       "why_risky": "학생이 힘든 감정이나 고민을 입력하는 기능이 있는데 위기 상황에 도움을 요청할 안내가 없으면, 정말 도움이 필요한 학생이 어디에 연락해야 할지 몰라 넘어갈 수 있습니다.",
       "fix_hint": "감정·고민을 입력하는 화면에 \"힘들 때는 선생님이나 청소년상담 1388로 연락하세요\" 같은 안내 문구를 넣으세요."
+    },
+    {
+      "id": "H-edu-fit",
+      "category": 9,
+      "base_severity": "medium",
+      "question": "활동 내용과 표현이 대상 학년의 발달 단계에 맞고, 학생을 낙인찍거나 서열화하지 않는다",
+      "methods": [
+        "teacher"
+      ],
+      "applicability": {
+        "na_when": "교과 학습 목적의 콘텐츠가 아님"
+      },
+      "absence_proof": false,
+      "subchecks": [
+        {
+          "id": "developmental-stage-fit",
+          "text": "대상 학년의 발달 단계에 맞는 내용·어휘·난이도",
+          "required_coverage": [
+            "teacher"
+          ],
+          "stacks": "all"
+        },
+        {
+          "id": "no-stigma-or-ranking",
+          "text": "학생을 낙인찍거나 공개적으로 서열화하는 표현·기능이 없음",
+          "required_coverage": [
+            "teacher"
+          ],
+          "stacks": "all"
+        }
+      ],
+      "basis": "교육부 학습지원 소프트웨어 선정 기준(2025.12) 선택기준 ①·② + 교육분야 인공지능 윤리원칙",
+      "why_risky": "학년 수준에 맞지 않는 내용이나 꼴찌 표시·공개 순위 같은 기능은 학습 효과를 떨어뜨리고, 특정 학생에게 상처를 줄 수 있습니다.",
+      "fix_hint": "대상 학년 학생 몇 명과 미리 써 보고, 어려운 낱말·부정적인 표현·공개 순위 기능이 있다면 바꾸거나 빼세요."
+    },
+    {
+      "id": "H-standards",
+      "category": 9,
+      "base_severity": "low",
+      "question": "다루는 교과 성취기준을 밝히고, 활동 내용이 그 성취기준에 맞는다",
+      "methods": [
+        "teacher"
+      ],
+      "applicability": {
+        "na_when": "교과 학습 목적의 콘텐츠가 아님"
+      },
+      "absence_proof": false,
+      "subchecks": [
+        {
+          "id": "standards-declared",
+          "text": "다루는 교과 성취기준(코드·문장) 명시",
+          "required_coverage": [
+            "teacher"
+          ],
+          "stacks": "all"
+        },
+        {
+          "id": "activity-matches-standards",
+          "text": "활동 내용과 명시한 성취기준의 부합",
+          "required_coverage": [
+            "teacher"
+          ],
+          "stacks": "all"
+        }
+      ],
+      "basis": "교육부 학습지원 소프트웨어 선정 기준(2025.12) 선택기준 ① + 국가 교육과정 성취기준",
+      "why_risky": "성취기준이 분명하지 않으면 수업 시간을 써도 무엇을 배웠는지 확인하기 어렵고, 학교운영위원회 심의에서 교육적 필요를 설명하기도 어렵습니다.",
+      "fix_hint": "앱 소개나 교사용 안내에 다루는 성취기준(예: [6국01-02])을 적고, 활동마다 어떤 성취기준과 이어지는지 한 줄씩 정리하세요."
+    },
+    {
+      "id": "H-usability",
+      "category": 9,
+      "base_severity": "low",
+      "question": "학생 기기와 학교 네트워크에서 수업 중에 실제로 쓸 수 있고, 기본 접근성을 갖췄다",
+      "methods": [
+        "teacher"
+      ],
+      "applicability": {
+        "na_when": "교과 학습 목적의 콘텐츠가 아님"
+      },
+      "absence_proof": false,
+      "subchecks": [
+        {
+          "id": "classroom-device-network",
+          "text": "학생 기기(태블릿·크롬북)와 학교 네트워크에서 동작 확인",
+          "required_coverage": [
+            "teacher"
+          ],
+          "stacks": "all"
+        },
+        {
+          "id": "basic-accessibility",
+          "text": "글자 크기·명도 대비·키보드 조작 등 기본 접근성",
+          "required_coverage": [
+            "teacher"
+          ],
+          "stacks": "all"
+        }
+      ],
+      "basis": "교육부 학습지원 소프트웨어 선정 기준(2025.12) 선택기준 ③·④ + 한국형 웹 콘텐츠 접근성 지침(KWCAG)",
+      "why_risky": "교사 컴퓨터에서는 잘 되던 앱도 학생 기기나 학교 와이파이에서는 느리거나 깨질 수 있고, 글자가 작거나 대비가 낮으면 일부 학생은 아예 쓰지 못합니다.",
+      "fix_hint": "수업 전에 학생이 쓰는 기기와 학교 네트워크로 미리 접속해 보고, 글자 크기·명도 대비·키보드만으로 조작할 수 있는지 확인하세요."
     }
   ]
 }

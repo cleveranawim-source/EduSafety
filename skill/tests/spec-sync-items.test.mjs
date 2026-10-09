@@ -10,9 +10,9 @@ describe('④ spec §6 ↔ items.json', () => {
     expect([...doc.keys()].sort()).toEqual(impl.map((i) => i.id).sort())
   })
 
-  it('항목 37개 · 하위 점검 134개다', () => {
-    expect(impl).toHaveLength(37)
-    expect(impl.reduce((n, i) => n + i.subchecks.length, 0)).toBe(134)
+  it('항목 42개 · 하위 점검 144개다 (core-2)', () => {
+    expect(impl).toHaveLength(42)
+    expect(impl.reduce((n, i) => n + i.subchecks.length, 0)).toBe(144)
   })
 
   it('항목별 모든 필드가 문서와 일치한다', () => {

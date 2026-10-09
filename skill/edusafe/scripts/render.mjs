@@ -16,6 +16,8 @@ const RULES = join(HERE, '..', 'rules')
 export const loadContract = () => JSON.parse(readFileSync(join(RULES, 'report.contract.json'), 'utf8'))
 export const loadItems = () => JSON.parse(readFileSync(join(RULES, 'items.json'), 'utf8')).items
 export const loadCategories = () => JSON.parse(readFileSync(join(RULES, 'items.json'), 'utf8')).categories || []
+// 보고서 아코디언이 그릴 마지막 카테고리 번호 — items.json 의 categories 가 정본 (core-2 는 9)
+const lastCategory = (categories) => categories.reduce((max, c) => Math.max(max, c.number), 0)
 export const loadMoeChecklist = () => JSON.parse(readFileSync(join(RULES, 'moe-checklist.json'), 'utf8'))
 export const loadSessionCanon = () => JSON.parse(readFileSync(join(RULES, 'session.json'), 'utf8')).sessions
 export const loadVersion = () => JSON.parse(readFileSync(join(RULES, 'version.json'), 'utf8'))
@@ -101,8 +103,11 @@ function constraintErrors(field, value, where) {
   if (c === '비어 있지 않음') {
     if (typeof value !== 'string' || value.trim() === '') out.push(`${where}: 비어 있지 않은 문자열이어야 합니다`)
   }
-  if (c === '1~8') {
-    if (!Number.isInteger(value) || value < 1 || value > 8) out.push(`${where}: 1~8 범위여야 합니다 (받은 값 ${JSON.stringify(value)})`)
+  // 카테고리 번호 범위 — 계약의 "1~N" 을 그대로 읽는다 (카테고리가 늘어도 검증기를 고칠 필요가 없게)
+  const range = c.match(/^1~(\d+)$/)
+  if (range) {
+    const max = Number(range[1])
+    if (!Number.isInteger(value) || value < 1 || value > max) out.push(`${where}: 1~${max} 범위여야 합니다 (받은 값 ${JSON.stringify(value)})`)
   }
   // 지문 자리에 아무 문자열이나 들어가면 "대조 자료"가 아니라 장식이 된다(리뷰에서 실측)
   if (c === 'sha256:…') {
@@ -616,7 +621,7 @@ export function renderMarkdown(report, items) {
   const categories = loadCategories()
   L.push('## 항목별 판정')
   L.push('')
-  for (let category = 1; category <= 8; category++) {
+  for (let category = 1; category <= lastCategory(categories); category++) {
     const group = report.items.filter((i) => i.category === category)
     if (group.length === 0) continue
     const meta = categories.find((c) => c.number === category)
@@ -933,7 +938,7 @@ function categoriesHtml(report, items) {
   const index = findingIndex(report.items)
   const categories = loadCategories()
   const out = []
-  for (let category = 1; category <= 8; category++) {
+  for (let category = 1; category <= lastCategory(categories); category++) {
     const group = report.items.filter((i) => i.category === category)
     if (group.length === 0) continue
     const meta = categories.find((c) => c.number === category)

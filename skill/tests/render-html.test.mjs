@@ -93,7 +93,7 @@ describe('renderHtml (REQ-8.16 ~ REQ-8.19)', () => {
     expect(html).not.toContain('AIzaSyD1234567890')
   })
 
-  it(`6. 항목 37개와 하위 점검 ${SUBCHECK_TOTAL}개가 전부 나온다`, () => {
+  it(`6. 항목 ${items.length}개와 하위 점검 ${SUBCHECK_TOTAL}개가 전부 나온다`, () => {
     const missingItems = items.filter((i) => !html.includes(`id="item-${i.id}"`))
     expect(missingItems.map((i) => i.id), 'HTML 에 빠진 항목').toEqual([])
     const missingSubs = []

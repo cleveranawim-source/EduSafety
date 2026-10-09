@@ -141,6 +141,27 @@
       "question": "이 앱을 정규 교과 수업에 사용하시나요? 사용하신다면 학교운영위원회 심의를 거치셨나요?",
       "answer_type": "예/아니오 + 한 줄",
       "updates": "all"
+    },
+    {
+      "item_id": "H-edu-fit",
+      "kind": "teacher",
+      "question": "이 앱의 내용과 표현이 대상 학년의 발달 단계에 맞나요? 학생을 낙인찍거나 공개적으로 순위를 매기는 표현·기능은 없나요?",
+      "answer_type": "예/아니오 + 한 줄",
+      "updates": "all"
+    },
+    {
+      "item_id": "H-standards",
+      "kind": "teacher",
+      "question": "이 앱이 다루는 교과 성취기준은 무엇인가요? 활동 내용이 그 성취기준에 맞나요?",
+      "answer_type": "한 줄 서술",
+      "updates": "all"
+    },
+    {
+      "item_id": "H-usability",
+      "kind": "teacher",
+      "question": "학생이 쓰는 기기와 학교 네트워크에서 미리 써 보셨나요? 글자 크기·명도 대비·조작에 불편한 점은 없었나요?",
+      "answer_type": "예/아니오 + 한 줄",
+      "updates": "all"
     }
   ]
 }

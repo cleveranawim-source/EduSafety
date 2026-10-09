@@ -120,6 +120,6 @@ describe('리뷰 반영 회귀 — 갱신 대상 파싱', () => {
   })
 
   it('정상 문서는 그대로 파싱된다', () => {
-    expect(specSession(readSpec())).toHaveLength(17)
+    expect(specSession(readSpec())).toHaveLength(20)
   })
 })

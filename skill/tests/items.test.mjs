@@ -26,18 +26,18 @@ describe('items.json 무결성', () => {
     expect(dups, `하위 점검 id 중복: ${dups.join(', ')}`).toEqual([])
   })
 
-  it('category 는 1~8, base_severity 는 high/medium/low 다', () => {
+  it('category 는 1~9, base_severity 는 high/medium/low 다', () => {
     const bad = items.filter(
-      (i) => !Number.isInteger(i.category) || i.category < 1 || i.category > 8 ||
+      (i) => !Number.isInteger(i.category) || i.category < 1 || i.category > 9 ||
              !['high', 'medium', 'low'].includes(i.base_severity),
     )
     expect(bad.map((i) => i.id)).toEqual([])
   })
 
-  it('중요도 분포가 상 14 · 중 18 · 하 5 다', () => {
+  it('중요도 분포가 상 15 · 중 19 · 하 8 다 (core-2)', () => {
     const count = (s) => items.filter((i) => i.base_severity === s).length
     expect({ high: count('high'), medium: count('medium'), low: count('low') })
-      .toEqual({ high: 14, medium: 18, low: 5 })
+      .toEqual({ high: 15, medium: 19, low: 8 })
   })
 
   it('methods 는 정해진 4개 중에서만 쓴다', () => {
@@ -120,10 +120,10 @@ describe('스캐폴드 규범', () => {
 
 // spec §6 의 카테고리 소제목 ↔ items.json 의 categories
 describe('④ 카테고리 제목 동기화', () => {
-  it('카테고리 8개가 spec §6 소제목과 일치한다', () => {
+  it('카테고리 9개가 spec §6 소제목과 일치한다', () => {
     expect(data.categories).toEqual(specCategories(readSpec()))
-    expect(data.categories).toHaveLength(8)
-    expect(data.categories.map((c) => c.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
+    expect(data.categories).toHaveLength(9)
+    expect(data.categories.map((c) => c.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9])
   })
 
   it('모든 항목의 category 가 정의된 카테고리를 가리킨다', () => {

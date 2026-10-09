@@ -224,7 +224,7 @@ describe('리뷰 반영 회귀 — 검증기', () => {
     r.items.push(structuredClone(r.items[0]))
     const out = errs(r).join('\n')
     expect(out).toMatch(/중복된 항목/)
-    expect(out).toMatch(/정확히 37개/)
+    expect(out).toMatch(new RegExp(`정확히 ${items.length}개`))
   })
 
   it('발견 3 — 하위 점검 id 가 중복되면 거부한다', () => {

@@ -75,10 +75,10 @@ describe('renderMarkdown (REQ-8.20)', () => {
     expect(validateReport(report, items, contract)).toEqual([])
   })
 
-  it('항목 37개가 전부 나온다', () => {
+  it(`항목 ${items.length}개가 전부 나온다`, () => {
     const missing = items.filter((i) => !md.includes(`#### ${i.id} —`))
     expect(missing.map((i) => i.id), 'MD 에 빠진 항목').toEqual([])
-    expect(items).toHaveLength(37)
+    expect(items).toHaveLength(42)
   })
 
   it(`하위 점검 ${SUBCHECK_TOTAL}개가 전부 나온다`, () => {

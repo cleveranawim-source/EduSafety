@@ -20,7 +20,7 @@ description: 교사가 만든 교육용 앱을 개인정보 보호법·안전조
 | 파일 | 무엇 |
 |---|---|
 | `rules/version.json` | 버전 정본 |
-| `rules/items.json` | 점검 항목 37개와 하위 점검 |
+| `rules/items.json` | 점검 항목 42개와 하위 점검 |
 | `rules/scan-rules.mjs` | 결정적 스캔 규칙 48개 |
 | `rules/report.contract.json` | 보고서 필드 계약 |
 | `rules/moe-checklist.json` | 교육부 [서식 1] 필수기준 매핑 |
@@ -37,7 +37,7 @@ description: 교사가 만든 교육용 앱을 개인정보 보호법·안전조
 | 2 히스토리 | git 로컬 ref 전체에서 키·`.env`·데이터 파일 스캔 | 없음 | 해당 없음 | `history` |
 | 3 빌드(선택) | install·build 명령을 보여주고 각각 승인 후 실행 | **있음** | **묻지 않고 건너뛴다.** 단 기존 빌드 산출물이 이미 있으면 빌드 없이 읽기 전용으로 스캔한다 | `build` |
 | 4a 프로필 | data_inventory·actors·entry·controller·db_paths·destinations 작성 | 없음 | 해당 없음 | `code` |
-| 4b 판정 | 항목 37개를 카테고리 순으로 판정 | 없음 | 해당 없음 | `code` |
+| 4b 판정 | 항목 42개를 카테고리 순으로 판정 | 없음 | 해당 없음 | `code` |
 | 5 판정 마무리 | needs_human 확정, 확인 후보 목록화 | 없음(질문 금지) | 해당 없음 — 질문하지 않고 목록만 만든다 | — |
 | 6 보고서 | `edusafe-report.json` 작성 → `render.mjs` | 없음 | 해당 없음 — **여기서 보고서가 완성된다** | — |
 | 7 선택적 갱신 | 확인 후보를 질문으로 제시하고 답이 오면 갱신 | **있음** | **6의 보고서가 최종본이다** | `evidence`·`teacher` |
@@ -109,7 +109,7 @@ git 이 없으면 `coverage.history = { status: "skipped", reason: "no-git" }` �
 
 ### 4b단계 — 판정
 
-`rules/items.json` 의 37개를 카테고리 순으로 판정한다. `applicability` 조건에 걸리면 `na`(사유 필수), 아니면 판정한다.
+`rules/items.json` 의 42개를 카테고리 순으로 판정한다. `applicability` 조건에 걸리면 `na`(사유 필수), 아니면 판정한다.
 
 부재 증명 항목은 스캐너의 `negative_scan` 근거로 판정하고, 나머지는 스캔 hit·인벤토리·입력 폼·저장 호출을 진입점으로 코드를 추적해 판정한다. 근거를 대지 못하면 `needs_human` 후보다.
 
@@ -168,7 +168,7 @@ node <이 스킬 폴더>/scripts/render.mjs <staging 폴더>
 
 - `pass`·`fail` 에는 **근거가 1개 이상 필수**다 — 인용(파일·줄·내용) 또는 `negative_scan`(규칙·범위). 없으면 `needs_human` 으로 강등하고 `demotion_reason` 을 기록한다.
 - 부재 증명 항목은 한 줄 인용으로 pass 할 수 없다. pass 근거는 `negative_scan` 유형이다. 스캐너 미실행(`agent-fallback`)이거나 범위가 미달이면 pass 가 아니라 `needs_human`(사유 `coverage-insufficient`)이다.
-- 37개 항목 전부가 보고서에 나타난다. 누락은 `needs_human` 으로 채운다.
+- 42개 항목 전부가 보고서에 나타난다. 누락은 `needs_human` 으로 채운다.
 - **확신이 없으면 `fail` 이 아니라 `needs_human`** 으로 남기고 확인 세션 후보로 돌린다. 과잉 판정을 하지 않는다.
 - `na` 에는 `applicability_reason` 이 필수다.
 - 비밀키·개인정보 인용은 **앞 6자 + `****`** 로 마스킹한다. 모든 산출물에 공통 적용하며, 마스킹은 저장하기 전 단계에서 이루어진다.

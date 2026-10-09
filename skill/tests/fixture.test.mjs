@@ -55,7 +55,7 @@ describe('부재 증명 항목 ↔ 픽스처 신호 1:1', () => {
 })
 
 describe('골든 스캔 대조', () => {
-  it('expect_items 가 37개 전수다', () => {
+  it('expect_items 가 항목 전수다', () => {
     expect(Object.keys(golden.expect_items).sort()).toEqual(items.map((i) => i.id).sort())
   })
 

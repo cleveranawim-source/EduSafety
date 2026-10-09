@@ -567,7 +567,7 @@
       "path": "items",
       "type": "array<object>",
       "required": true,
-      "spec_constraint": "정확히 37개 · 원소는 items[] 행",
+      "spec_constraint": "정확히 42개 · 원소는 items[] 행",
       "allowed": null,
       "keys": null,
       "element_required": [
@@ -667,7 +667,7 @@
       "path": "items[].category",
       "type": "number",
       "required": true,
-      "spec_constraint": "1~8",
+      "spec_constraint": "1~9",
       "allowed": null,
       "keys": null,
       "element_required": null,
