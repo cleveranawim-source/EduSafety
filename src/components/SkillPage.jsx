@@ -14,8 +14,10 @@ const ZIP_SIZE = '262KB'
 // 처럼 두 겹이 되어 오히려 나쁘다. 빌드 산출물 이름(edusafe-v<버전>.zip)은 REQ-13.1
 // 이 정한 대로 유지하고, 게시할 때만 이름을 바꿔 복사한다. 바이트는 같으므로
 // ZIP_SHA256 도 그대로다.
-const ZIP_PATH = '/download/edusafe.zip'
-const SHA_PATH = '/download/edusafe.sha256'
+// 상대 경로 — 사이트가 하위 경로(GitHub Pages의 /EduSafety/)에 올라가도 내려받기가 동작한다
+const ZIP_PATH = 'download/edusafe.zip'
+const SHA_PATH = 'download/edusafe.sha256'
+const MANIFEST_PATH = 'download/manifest.json'
 
 // 정본 제목은 "수집 — 무엇을 모으나" 꼴이다. 부제가 없는 카테고리만 여기서 보충한다.
 const CATEGORY_NOTES = { 6: '주입·검증 취약점', 8: '미성년 보호 장치' }
@@ -145,7 +147,7 @@ export default function SkillPage() {
             <div><dt>공식 스킬 지문</dt><dd>{SKILL_DIGEST}</dd></div>
             <div>
               <dt>구성 대조 자료</dt>
-              <dd><a href="/download/manifest.json">manifest.json</a> — 파일별 해시 11개</dd>
+              <dd><a href={MANIFEST_PATH}>manifest.json</a> — 파일별 해시 11개</dd>
             </div>
           </dl>
         </div>

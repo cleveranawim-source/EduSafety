@@ -194,6 +194,10 @@ export async function fetchSecurityScanConfig(fetchImpl = globalThis.fetch) {
     method: 'GET',
     headers: { Accept: 'application/json' },
   })
+  // 정적 호스팅(GitHub Pages 등)에는 검사 서버가 없다 — 실패 원인을 그대로 알린다
+  if (response.status === 404) {
+    throw new Error('이 주소에는 URL 검사 서버가 없습니다. URL 검사는 검사 서버를 함께 배포한 사이트에서만 쓸 수 있습니다.')
+  }
   const payload = await readJson(response, '보안 점검 설정을 불러오지 못했습니다.')
 
   if (

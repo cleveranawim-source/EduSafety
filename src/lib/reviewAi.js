@@ -9,6 +9,10 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { FEATURES } from '../data/rubric.js'
 import { redactSecrets } from './redact.js'
 
+// 화면은 엄격한 보안 정책(eval 금지)으로 배포된다. zod가 eval 가능 여부를 시험하면 정책 위반 경고가 남으므로
+// 시험 자체를 끈다 (스키마가 작아 성능 차이는 없다).
+z.config({ jitless: true })
+
 export const DEFAULT_MODEL = 'claude-opus-5-5'
 // 가격은 USD / 100만 토큰 (2026-09 기준 공식 단가). 캐시 쓰기는 입력의 1.25배.
 // 선택 목록은 현행 세대만 둔다. 세 모델 모두 안전 분류기의 거부가 있을 수 있어, 거부되면 서버가
