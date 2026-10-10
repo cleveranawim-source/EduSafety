@@ -1,7 +1,7 @@
 import "dotenv/config";
 import type { Express } from "express";
 import { createApp } from "./app.js";
-import { loadConfig, type AppConfig } from "./config.js";
+import { loadConfig, STANDALONE_URL_SCAN_DATABASE_URL, type AppConfig } from "./config.js";
 import { createDatabasePool, type DatabasePool } from "./db/client.js";
 import { PostgresCertificationRepository } from "./db/postgres-repository.js";
 import { PostgresReviewRepository } from "./db/review-repository.js";
@@ -9,7 +9,7 @@ import { UnavailableCertificationRepository } from "./db/unavailable-repository.
 import { GitHubClient } from "./github/client.js";
 
 const REQUIRED_MIGRATION = "001_eas_offchain_v2_certification";
-export const STANDALONE_URL_SCAN_DATABASE_URL = "standalone://url-scan";
+export { STANDALONE_URL_SCAN_DATABASE_URL };
 
 export interface ServerRuntime {
   readonly app: Express;

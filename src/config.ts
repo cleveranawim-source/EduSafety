@@ -1,4 +1,5 @@
 import { getAddress, Wallet } from "ethers";
+import { randomBytes } from "node:crypto";
 import { isIP } from "node:net";
 import { z } from "zod";
 
@@ -8,6 +9,8 @@ export const EAS_OFFCHAIN_VERSION = 2;
 export const EAS_VERIFYING_CONTRACT = "0x4200000000000000000000000000000000000021";
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const ZERO_BYTES32 = `0x${"00".repeat(32)}`;
+
+export const STANDALONE_URL_SCAN_DATABASE_URL = "standalone://url-scan";
 
 const DEFAULT_SCHEMA_UID =
   "0xf58b8b212ef75ee8cd7e8d803c37c03e0519890502d5e99ee2412aae1456cafe";
@@ -103,8 +106,35 @@ function parseSecurityScanOrigins(value: string): ReadonlySet<string> {
   return origins;
 }
 
+// 배포 편의 기본값.
+// - 공개 주소를 적지 않았으면 Vercel 이 알려 주는 운영 주소를 쓴다 (관리자·URL 검사 API 의 같은 출처 확인용).
+// - URL 검사 전용 배포(standalone)에는 인증마크 서명·관리자 기능이 없다. 그 값이 비어 있으면 이 프로세스에서만
+//   쓰는 임시값으로 채운다 — 서명 키는 쓰이지 않고, 관리자 비밀번호 해시는 어떤 비밀번호와도 맞지 않는
+//   무작위 값이라 관리자 로그인은 열리지 않는다. 값을 직접 넣으면 그 값이 우선한다.
+function withDeploymentDefaults(environment: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  const filled: NodeJS.ProcessEnv = { ...environment };
+  if (!filled.BADGE_PUBLIC_BASE_URL && filled.VERCEL_PROJECT_PRODUCTION_URL) {
+    filled.BADGE_PUBLIC_BASE_URL = `https://${filled.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (filled.DATABASE_URL !== STANDALONE_URL_SCAN_DATABASE_URL) return filled;
+
+  if (!filled.EAS_ATTESTER_PRIVATE_KEY && !filled.EAS_ATTESTER_ADDRESS) {
+    const wallet = Wallet.createRandom();
+    filled.EAS_ATTESTER_PRIVATE_KEY = wallet.privateKey;
+    filled.EAS_ATTESTER_ADDRESS = wallet.address;
+    if (!filled.EAS_TRUSTED_ATTESTER_ADDRESSES) filled.EAS_TRUSTED_ATTESTER_ADDRESSES = wallet.address;
+  }
+  if (!filled.ADMIN_ID) filled.ADMIN_ID = "standalone-disabled";
+  if (!filled.ADMIN_USERNAME) filled.ADMIN_USERNAME = "standalone-disabled";
+  if (!filled.ADMIN_PASSWORD_SCRYPT) {
+    filled.ADMIN_PASSWORD_SCRYPT = `scrypt$${randomBytes(16).toString("base64url")}$${randomBytes(32).toString("base64url")}`;
+  }
+  if (!filled.ADMIN_SESSION_SECRET) filled.ADMIN_SESSION_SECRET = randomBytes(32).toString("base64url");
+  return filled;
+}
+
 export function loadConfig(environment: NodeJS.ProcessEnv = process.env): AppConfig {
-  const parsed = environmentSchema.parse(environment);
+  const parsed = environmentSchema.parse(withDeploymentDefaults(environment));
   const walletAddress = getAddress(new Wallet(parsed.EAS_ATTESTER_PRIVATE_KEY).address);
   const configuredAddress = getAddress(parsed.EAS_ATTESTER_ADDRESS);
   if (walletAddress !== configuredAddress) {
