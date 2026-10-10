@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ReviewMode from './components/ReviewMode.jsx'
 import ReviewLedger from './components/ReviewLedger.jsx'
 import AboutPage from './components/AboutPage.jsx'
@@ -15,8 +15,29 @@ const TABS = [
   { key: 'ledger', icon: '📚', label: '심사 기록', tone: 'home' },
 ]
 
+// 화면마다 주소가 있다 (#skill · #review · #security · #ledger) — 링크로 바로 열고, 뒤로 가기로 돌아온다.
+const VIEW_KEYS = new Set(TABS.map((t) => t.key))
+const viewFromHash = () => {
+  if (typeof window === 'undefined') return 'about'
+  const key = window.location.hash.slice(1)
+  return VIEW_KEYS.has(key) ? key : 'about'
+}
+
 export default function App() {
-  const [view, setView] = useState('about')
+  const [view, setViewState] = useState(viewFromHash)
+
+  useEffect(() => {
+    const onHashChange = () => setViewState(viewFromHash())
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  const setView = (key) => {
+    const hash = key === 'about' ? '' : `#${key}`
+    if (window.location.hash !== hash) window.history.pushState(null, '', `${window.location.pathname}${window.location.search}${hash}`)
+    setViewState(key)
+    window.scrollTo(0, 0)
+  }
 
   return (
     <div className="app">

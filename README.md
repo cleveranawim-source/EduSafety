@@ -54,6 +54,26 @@ install·build·test·lifecycle 코드를 실행하지 않으며, GitHub REST AP
 웹앱에서 심사자가 직접 판정합니다. 기준을 바꾸면 스킬 배포본(`npm --prefix skill run build:zip`)과
 `public/download/`, 스킬 소개 페이지의 버전·해시를 함께 갱신합니다.
 
+## 배포 주소 (개인 사본)
+
+| 주소 | 내용 |
+|---|---|
+| https://edusafe-review.vercel.app | 전체 앱 + URL 검사 서버 (Vercel, 기본 주소) |
+| https://cleveranawim-source.github.io/EduSafety/ | 화면만 (GitHub Pages). URL 검사·인증마크·서버 대장은 Vercel 주소에서 |
+
+화면마다 주소가 있습니다: `#skill` · `#review` · `#security` · `#ledger`.
+main 에 올리면 두 곳 모두 자동으로 다시 배포됩니다.
+
+Vercel 은 URL 검사 전용 모드로 운영하며 환경변수는 두 개뿐입니다.
+
+```
+DATABASE_URL=standalone://url-scan
+SECURITY_SCAN_DYNAMIC_TARGETS_ENABLED=true
+```
+
+이 모드에서는 인증마크 서명 키와 관리자 계정을 받지 않고 프로세스 전용 임시값을 씁니다
+(관리자 로그인은 열리지 않습니다). 공개 주소는 Vercel 운영 주소를 자동으로 씁니다.
+
 ## 로컬 실행
 
 Node.js 22 이상과 PostgreSQL 17을 준비합니다.

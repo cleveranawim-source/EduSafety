@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 const CONFIG_ENDPOINT = '/api/security-scan/config'
+// 검사 서버가 없는 정적 배포(GitHub Pages)에서만 빌드 때 넣는다 — 서버가 있는 주소로 안내한다
+const FULL_SITE_URL = import.meta.env.VITE_FULL_SITE_URL || ''
 const SCAN_ENDPOINT = '/api/security-scan'
 
 const SEVERITY_LABELS = {
@@ -803,9 +805,15 @@ export default function SecurityAuditPage() {
       ) : configError ? (
         <div className="audit-config-error">
           <div className="error" role="alert">⚠️ {configError}</div>
-          <button type="button" className="btn-secondary" onClick={() => setConfigAttempt((attempt) => attempt + 1)}>
-            설정 다시 불러오기
-          </button>
+          {FULL_SITE_URL ? (
+            <a className="btn-primary audit-full-site" href={`${FULL_SITE_URL.replace(/\/$/, '')}/#security`}>
+              🔎 검사 서버가 있는 주소에서 URL 검사 열기
+            </a>
+          ) : (
+            <button type="button" className="btn-secondary" onClick={() => setConfigAttempt((attempt) => attempt + 1)}>
+              설정 다시 불러오기
+            </button>
+          )}
         </div>
       ) : (
         <>

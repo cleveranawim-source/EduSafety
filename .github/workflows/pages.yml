@@ -27,6 +27,9 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build:client
+        env:
+          # Pages 에는 검사 서버가 없다 — URL 검사 화면에서 서버가 있는 Vercel 주소로 안내한다
+          VITE_FULL_SITE_URL: https://edusafe-review.vercel.app
       - uses: actions/upload-pages-artifact@v3
         with:
           path: client-dist
